@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="10dp">
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rb_threshold"
+            android:textColor="@color/textColorPrimary"
+            android:text="Threshold"
+            android:drawableBottom="@android:drawable/btn_radio"
+            android:button="@null"
+            android:gravity="center_horizontal|bottom"
+            android:clickable="false"
+            android:textSize="10sp"
+            android:buttonTint="@android:color/holo_blue_light"
+            android:layout_weight="1"
+
+            />
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rb_priority"
+            android:textColor="@color/textColorPrimary"
+            android:drawableBottom="@android:drawable/btn_radio"
+            android:button="@null"
+            android:gravity="center_horizontal|bottom"
+            android:layout_marginLeft="16dp"
+            android:clickable="false"
+            android:text="Priority"
+            android:textSize="10sp"
+            android:layout_weight="1"
+
+            />
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rb_geo_fence"
+            android:textColor="@color/textColorPrimary"
+            android:drawableBottom="@android:drawable/btn_radio"
+            android:button="@null"
+            android:gravity="center_horizontal|bottom"
+            android:layout_marginLeft="16dp"
+            android:clickable="false"
+            android:text="GeoFencing"
+            android:textSize="10sp"
+            android:layout_weight="1"
+
+            />
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rb_data_log"
+            android:textColor="@color/textColorPrimary"
+            android:drawableBottom="@android:drawable/btn_radio"
+            android:button="@null"
+            android:gravity="center_horizontal|bottom"
+            android:layout_marginLeft="16dp"
+            android:clickable="false"
+            android:text="Data Logging"
+            android:textSize="10sp"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_current_wifi"
+        android:textSize="20sp"
+        android:layout_marginTop="8dp"
+        android:text="Wifi: TigerWifi\nStrength: Your Momma"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerview_scan_aps"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+        <TextView
+            android:id="@+id/tv_error_message_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/error_message"
+            android:textSize="20sp"
+            android:visibility="invisible" />
+
+        <ProgressBar
+            android:id="@+id/pb_loading_indicator"
+            android:layout_height="42dp"
+            android:layout_width="42dp"
+            android:layout_gravity="center"
+            android:visibility="invisible" />
+    </FrameLayout>
+
+</LinearLayout>

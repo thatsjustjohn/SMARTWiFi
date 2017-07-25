@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <!-- THRESHOLD -->
+    <PreferenceCategory
+        android:title="@string/pref_threshold_label">
+            <CheckBoxPreference
+                android:defaultValue="@bool/pref_threshold_default"
+                android:key="@string/pref_threshold_key"
+                android:title="@string/pref_threshold_label"
+                android:summaryOn="@string/pref_show_true"
+                android:summaryOff="@string/pref_show_false" />
+            <EditTextPreference
+                android:defaultValue="@string/pref_threshold_connect_default"
+                android:key="@string/pref_threshold_connect_key"
+                android:title="@string/pref_threshold_connect_label"
+                android:summary="@string/pref_threshold_connect_summary"
+                android:inputType="text"
+                android:singleLine="true" />
+            <EditTextPreference
+                android:defaultValue="@string/pref_threshold_disconnect_default"
+                android:key="@string/pref_threshold_disconnect_key"
+                android:title="@string/pref_threshold_disconnect_label"
+                android:summary="@string/pref_threshold_disconnect_summary"
+                android:inputType="text"
+                android:singleLine="true" />
+    </PreferenceCategory>
+
+
+
+
+    <!-- PRIORITY -->
+    <PreferenceCategory
+        android:title="@string/pref_priority_label">
+        <CheckBoxPreference
+            android:defaultValue="@bool/pref_priority_default"
+            android:key="@string/pref_priority_key"
+            android:title="@string/pref_priority_label"
+            android:summaryOn="@string/pref_show_true"
+            android:summaryOff="@string/pref_show_false"/>
+        <Preference
+            android:title="Open Priority List" />
+    </PreferenceCategory>
+
+
+    <!-- GEO FENCE-->
+    <PreferenceCategory
+        android:title="@string/pref_geo_fence_label">
+        <CheckBoxPreference
+            android:defaultValue="@bool/pref_geo_fence_default"
+            android:key="@string/pref_geo_fence_key"
+            android:title="@string/pref_geo_fence_label"
+            android:summaryOn="@string/pref_show_true"
+            android:summaryOff="@string/pref_show_false" />
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/pref_number_option_labels"
+            android:entryValues="@array/pref_number_option_values"
+            android:key="@string/pref_number_of_geo_fence_key"
+            android:title="@string/pref_number_of_geo_fence_label" />
+
+        <!-- GEO FENCE 1 -->
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_one_lat_default"
+            android:key="@string/pref_geo_fence_one_lat_key"
+            android:title="@string/pref_geo_fence_lat_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_one_long_default"
+            android:key="@string/pref_geo_fence_one_long_key"
+            android:title="@string/pref_geo_fence_long_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_one_radius_default"
+            android:key="@string/pref_geo_fence_one_radius_key"
+            android:title="@string/pref_geo_fence_radius_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+
+        <!-- GEO FENCE 2 -->
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_two_lat_default"
+            android:key="@string/pref_geo_fence_two_lat_key"
+            android:title="@string/pref_geo_fence_lat_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_two_long_default"
+            android:key="@string/pref_geo_fence_two_long_key"
+            android:title="@string/pref_geo_fence_long_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_two_radius_default"
+            android:key="@string/pref_geo_fence_two_radius_key"
+            android:title="@string/pref_geo_fence_radius_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+
+
+        <!-- GEO FENCE 3 -->
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_three_lat_default"
+            android:key="@string/pref_geo_fence_three_lat_key"
+            android:title="@string/pref_geo_fence_lat_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_three_long_default"
+            android:key="@string/pref_geo_fence_three_long_key"
+            android:title="@string/pref_geo_fence_long_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_geo_fence_three_radius_default"
+            android:key="@string/pref_geo_fence_three_radius_key"
+            android:title="@string/pref_geo_fence_radius_label"
+            android:inputType="text"
+            android:singleLine="true"/>
+
+    </PreferenceCategory>
+
+
+
+    <!-- Data Logging -->
+    <PreferenceCategory
+        android:title="@string/pref_data_log_key">
+        <CheckBoxPreference
+            android:defaultValue="@bool/pref_data_log_default"
+            android:key="@string/pref_data_log_key"
+            android:title="@string/pref_data_log_key"
+            android:summaryOn="@string/pref_show_true"
+            android:summaryOff="@string/pref_show_false" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

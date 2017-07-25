@@ -1,0 +1,109 @@
+<resources>
+    <string name="app_name">SMARTWiFi</string>
+    <string name="action_scan">Scan</string>
+    <string name="error_message">An Error has occurred. Please try again by clicking Scan</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- - - - - - - - - - - - - - - -
+          - Used by Preferences  -
+          - - - - - - - - - - - - - - - -->
+
+    <!-- MAIN TASKS -->
+
+    <string name="pref_threshold_label">Threshold</string>
+    <string name="pref_threshold_key" translatable="false">threshold</string>
+
+    <string name="pref_priority_label">Priority</string>
+    <string name="pref_priority_key" translatable="false">priority</string>
+
+    <string name="pref_geo_fence_label">Geo Fence</string>
+    <string name="pref_geo_fence_key" translatable="false">geo_fence</string>
+
+    <string name="pref_data_log_label">Data Logging</string>
+    <string name="pref_data_log_key" translatable="false">data_logging</string>
+
+
+    <!-- THRESHOLD -->
+    <string name="pref_threshold_connect_label">Reconnect RSSI</string>
+    <string name="pref_threshold_connect_key">threshold_reconnect</string>
+    <string name="pref_threshold_connect_default" translatable="false">-70</string>
+
+    <string name="pref_threshold_disconnect_label">Disconnect RSSI</string>
+    <string name="pref_threshold_disconnect_key">threshold_disconnect</string>
+    <string name="pref_threshold_disconnect_default" translatable="false">-75</string>
+
+    <string name="pref_show_true">Activated</string>
+    <string name="pref_show_false">Deactivated</string>
+
+
+    <string name="pref_threshold_connect_summary">RSSI Strength to connect at.  The closer to zero is strong (-70 Default)</string>
+    <string name="pref_threshold_disconnect_summary">RSSI Strength to connect at. The further from zero is weaker (-75 Default)</string>
+
+    <!-- PRIORITY -->
+    <!-- SHOULD BE DATABASE -->
+
+
+    <!-- DATA LOGGING / MACHINE LEARNING -->
+    <!-- DATABASE -->
+
+
+    <!-- GEO FENCING DROP DOWN -->
+
+    <string name="pref_geo_fence_lat_label">Geo Fence Lat</string>
+    <string name="pref_geo_fence_long_label">Geo Fence Long</string>
+    <string name="pref_geo_fence_radius_label">Geo Fence Radius</string>
+
+    <!-- GEO FENCING 1 -->
+    <string name="pref_geo_fence_one_label">Geo Fence 1</string>
+    <string name="pref_geo_fence_one_key" translatable="false">geo_fence_1</string>
+
+    <string name="pref_geo_fence_one_lat_key">geo_fence_1_lat</string>
+    <string name="pref_geo_fence_one_lat_default" translatable="false"></string>
+
+    <string name="pref_geo_fence_one_long_key">geo_fence_1_long</string>
+    <string name="pref_geo_fence_one_long_default" translatable="false"></string>
+
+    <string name="pref_geo_fence_one_radius_key">geo_fence_1_radius</string>
+    <string name="pref_geo_fence_one_radius_default" translatable="false"></string>
+
+
+    <!-- GEO FENCING 2 -->
+    <string name="pref_geo_fence_two_lat_label">Geo Fence 2</string>
+    <string name="pref_geo_fence_two_key" translatable="false">geo_fence_2</string>
+
+    <string name="pref_geo_fence_two_lat_key">geo_fence_2_lat</string>
+    <string name="pref_geo_fence_two_lat_default" translatable="false"></string>
+
+    <string name="pref_geo_fence_two_long_key">geo_fence_2_long</string>
+    <string name="pref_geo_fence_two_long_default" translatable="false"></string>
+
+    <string name="pref_geo_fence_two_radius_key">geo_fence_2_raidus</string>
+    <string name="pref_geo_fence_two_radius_default" translatable="false"></string>
+
+    <!-- GEO FENCING 3 -->
+    <string name="pref_geo_fence_three_lat_label">Geo Fence 3</string>
+    <string name="pref_geo_fence_three_key" translatable="false">geo_fence_3</string>
+
+    <string name="pref_geo_fence_three_lat_key">geo_fence_3_lat</string>
+    <string name="pref_geo_fence_three_lat_default" translatable="false"></string>
+
+    <string name="pref_geo_fence_three_long_key">geo_fence_3_long</string>
+    <string name="pref_geo_fence_three_long_default" translatable="false"></string>
+
+    <string name="pref_geo_fence_three_radius_key">geo_fence_3_raidus</string>
+    <string name="pref_geo_fence_three_radius_default" translatable="false"></string>
+
+
+    <!-- LABEL AND VALUES FOR NUMBERS -->
+    <string name="pref_number_of_geo_fence_label">Number of Geo Fences</string>
+    <string name="pref_number_of_geo_fence_key" translatable="false">number_of_geo_fences</string>
+
+    <string name="pref_number_label_one">1</string>
+    <string name="pref_number_label_two">2</string>
+    <string name="pref_number_label_three">3</string>
+
+    <string name="pref_number_one_value" translatable="false">1</string>
+    <string name="pref_number_two_value" translatable="false">2</string>
+    <string name="pref_number_three_value" translatable="false">3</string>
+
+</resources>
