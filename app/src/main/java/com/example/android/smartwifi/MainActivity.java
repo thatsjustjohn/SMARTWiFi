@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.SystemClock;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -39,7 +42,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         APAdapterOnClickHandler,
-        LoaderCallbacks<String[]>,
+        LoaderCallbacks<List<ScanResult>>,
         SharedPreferences.OnSharedPreferenceChangeListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -145,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements
          * to the call to initLoader below. This means that whenever the loaderManager has
          * something to notify us of, it will do so through this callback.
          */
-        LoaderCallbacks<String[]> callback = MainActivity.this;
+        LoaderCallbacks<List<ScanResult>> callback = MainActivity.this;
 
         /*
          * The second parameter of the initLoader method below is a Bundle. Optionally, you can
@@ -179,33 +182,43 @@ public class MainActivity extends AppCompatActivity implements
 
         ///This Code doesn't really work yet...moving to utils
 
-        boolean isWiFiEnabled = wifiManager.isWifiEnabled();
-        WifiInfo info=wifiManager.getConnectionInfo();
-        Log.d("TEST", info.toString());
-        Log.d("TEST", String.valueOf(isWiFiEnabled));
-        if(!isWiFiEnabled)
-        {
-            Log.d("TEST", String.valueOf(isWiFiEnabled));
-        }else {
-            Log.d("NOT ENABLED", String.valueOf(isWiFiEnabled));
-            //wifiReceiver = new WifiScanReceiver();
-            registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
+        //CHECK PERMISSIONS
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}
+                        , 10);
+            }
+            return;
+        }
+        boolean isWiFiEnabled = false;
+        try {
+            isWiFiEnabled = wifiManager.isWifiEnabled();
+            WifiInfo info = wifiManager.getConnectionInfo();
+            if (!isWiFiEnabled) {
+                Log.d("NOT ENABLED", String.valueOf(isWiFiEnabled));
+            } else {
+                Log.d("ENABLED", String.valueOf(isWiFiEnabled));
+                registerReceiver(new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
 
-                    int size;
-                    wifiInfo = wifiManager.getConnectionInfo();
-                    Log.d("TEST", wifiInfo.toString());
-                    wifiScanList = wifiManager.getScanResults();
-                    size = wifiScanList.size();
-                    wifis = new String[wifiScanList.size()];
-                    for (int i = 0; i < wifiScanList.size(); i++) {
-                        wifis[i] = ((wifiScanList.get(i)).toString());
+                        int size;
+                        wifiInfo = wifiManager.getConnectionInfo();
+                        Log.d("TEST", wifiInfo.toString());
+                        wifiScanList = wifiManager.getScanResults();
+                        size = wifiScanList.size();
+                        wifis = new String[wifiScanList.size()];
+                        for (int i = 0; i < wifiScanList.size(); i++) {
+                            wifis[i] = ((wifiScanList.get(i)).toString());
+                        }
+                        Log.d("onrecieve", String.valueOf(size) + " Access Points Initial");
                     }
-                    Log.d("onrecieve", String.valueOf(size));
-                }
-            }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-            wifiManager.startScan();
+                }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                wifiManager.startScan();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("ERROR", String.valueOf(isWiFiEnabled));
         }
 
 
@@ -257,12 +270,12 @@ public class MainActivity extends AppCompatActivity implements
      * @return Return a new Loader instance that is ready to start loading.
      */
     @Override
-    public Loader<String[]> onCreateLoader(int id, final Bundle loaderArgs) {
+    public Loader<List<ScanResult>> onCreateLoader(int id, final Bundle loaderArgs) {
 
-        return new AsyncTaskLoader<String[]>(this) {
+        return new AsyncTaskLoader<List<ScanResult>>(this) {
 
             /* This String array will hold and help cache our weather data */
-            String[] mAPData = null;
+            List<ScanResult> mAPData = null;
 
             /**
              * Subclasses of AsyncTaskLoader must implement this to take care of loading their data.
@@ -279,15 +292,16 @@ public class MainActivity extends AppCompatActivity implements
 
             /**
              * This is the method of the AsyncTaskLoader that will load and parse the JSON data
-             * from OpenWeatherMap in the background.
+             * from OpenWifiMap in the background.
              *
-             * @return Weather data from OpenWeatherMap as an array of Strings.
+             * @return  Wifi data from OpenWifiMap as an array of Strings.
              *         null if an error occurs
              */
             @Override
-            public String[] loadInBackground() {
+            public List<ScanResult> loadInBackground() {
                 try {
-                    String[] apData = {"TigerWifi", "ENGR", "TigerWIFI-GUEST", "eduroam", "GiveMeSomeMorse", "GiveMeSomeMorse5", "CakeAndPotatoes", "PotatoesAndCake"};
+
+                    List<ScanResult> apData = wifiManager.getScanResults();
                     wifiInfo = wifiManager.getConnectionInfo();
                     return apData;
                 } catch (Exception e) {
@@ -301,7 +315,7 @@ public class MainActivity extends AppCompatActivity implements
              *
              * @param data The result of the load
              */
-            public void deliverResult(String[] data) {
+            public void deliverResult(List<ScanResult> data) {
                 mAPData = data;
                 super.deliverResult(data);
             }
@@ -343,13 +357,19 @@ public class MainActivity extends AppCompatActivity implements
      * @param data The data generated by the Loader.
      */
     @Override
-    public void onLoadFinished(Loader<String[]> loader, String[] data) {
+    public void onLoadFinished(Loader<List<ScanResult>> loader, List<ScanResult> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if(null == wifiInfo || wifiInfo.getSSID() == "<unknown ssid>" || wifiInfo.getSSID() == ""){
+        if(null == wifiInfo || wifiInfo.getSSID().equals("<unknown ssid>") || wifiInfo.getSSID().equals("")){
             Log.d("LD", "connect Info is bad");
             mConnectionInfoTextView.setText("Not Connected");
+            wifiScanList = wifiManager.getScanResults();
+            int size = wifiScanList.size();
+            Log.d("onRecieve", String.valueOf(size) + " Access Points on Scan");
         }else{
-            mConnectionInfoTextView.setText(wifiInfo.toString());
+            wifiScanList = wifiManager.getScanResults();
+            int size = wifiScanList.size();
+            Log.d("onRecieve", String.valueOf(size) + " Access Points on Scan");
+            formatConnectionInfoText(wifiInfo);
         }
         mAPAdapter.setAPData(data);
         if (null == data) {
@@ -357,6 +377,12 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             showScanResultsDataView();
         }
+    }
+
+    public void formatConnectionInfoText(WifiInfo wifiInfo){
+        mConnectionInfoTextView.setText("SSID :: " + wifiInfo.getSSID()
+        + "\nStrength :: " + wifiInfo.getRssi()
+        + "\nLink Speed :: " + wifiInfo.getLinkSpeed());
     }
 
     /**
@@ -367,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements
      * @param loader The Loader that is being reset.
      */
     @Override
-    public void onLoaderReset(Loader<String[]> loader) {
+    public void onLoaderReset(Loader<List<ScanResult>> loader) {
         /*
          * We aren't using this method in our example application, but we are required to Override
          * it to implement the LoaderCallbacks<String> interface

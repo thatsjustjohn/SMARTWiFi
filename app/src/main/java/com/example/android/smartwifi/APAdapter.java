@@ -17,9 +17,9 @@ import java.util.List;
 
 public class APAdapter extends RecyclerView.Adapter<APAdapter.APAdapterViewHolder> {
 
-    private List<ScanResult> wifiList;
+    private List<ScanResult> mAPData;
 
-    private String[] mAPData;
+    //private String[] mAPData;
     /**
     * An on-click handler that we've defined to make it easy for an Activity to interface with
     * our RecyclerView
@@ -65,7 +65,7 @@ public class APAdapter extends RecyclerView.Adapter<APAdapter.APAdapterViewHolde
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             //<-------This will change with the list information --------------->
-            String apItemInList = mAPData[adapterPosition];
+            String apItemInList = mAPData.get(getAdapterPosition()).toString();
             mClickHandler.onClick(apItemInList);
         }
     }
@@ -104,7 +104,14 @@ public class APAdapter extends RecyclerView.Adapter<APAdapter.APAdapterViewHolde
      */
     @Override
     public void onBindViewHolder(APAdapterViewHolder apAdapterViewHolder, int position) {
-        String apForThisLocation = mAPData[position];
+        String apForThisLocation = "SSID :: " + mAPData.get(position).SSID
+                + "\nStrength :: " + mAPData.get(position).level
+                + "\nBSSID :: " + mAPData.get(position).BSSID
+                + "\nChannel :: "
+                + convertFrequencyToChannel(mAPData.get(position).frequency)
+                + "\nFrequency :: " + mAPData.get(position).frequency
+                + "\nCapability :: " + mAPData.get(position).capabilities;
+
         apAdapterViewHolder.mAPTextView.setText(apForThisLocation);
     }
 
@@ -117,7 +124,7 @@ public class APAdapter extends RecyclerView.Adapter<APAdapter.APAdapterViewHolde
     @Override
     public int getItemCount() {
         if (null == mAPData) return 0;
-        return mAPData.length;
+        return mAPData.size();
     }
 
     /**
@@ -127,9 +134,23 @@ public class APAdapter extends RecyclerView.Adapter<APAdapter.APAdapterViewHolde
      *
      * @param apData The new AP data to be displayed.
      */
-    public void setAPData(String[] apData) {
+    public void setAPData(List<ScanResult> apData) {
         mAPData = apData;
         notifyDataSetChanged();
+    }
+
+    /**
+     *  This method is used to convert Frequency to Channel
+     * @param freq the frewquency to be convert to channel
+     * @return the channel
+     */
+
+    public static int convertFrequencyToChannel(int freq) {
+        if (freq>= 2412 &&freq<= 2484) { return (freq - 2412) / 5 + 1; } else if (freq>= 5170 &&freq<= 5825) {
+            return (freq - 5170) / 5 + 34;
+        } else {
+            return -1;
+        }
     }
 
 }
