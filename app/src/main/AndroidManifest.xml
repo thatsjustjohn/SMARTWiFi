@@ -32,6 +32,10 @@
                 android:value=".MainActivity" />
         </activity>
         <activity android:name=".SettingsActivity"></activity>
+
+        <service
+            android:name=".sync.SMARTWifiIntentService"
+            android:exported="false"/>
     </application>
 
 </manifest>

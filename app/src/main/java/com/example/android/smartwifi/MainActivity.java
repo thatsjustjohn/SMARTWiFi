@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.os.AsyncTask;
@@ -34,6 +35,7 @@ import android.widget.Toast;
 
 
 import com.example.android.smartwifi.APAdapter.APAdapterOnClickHandler;
+import com.example.android.smartwifi.utilities.WifiGeoUtils;
 
 
 import java.net.URL;
@@ -70,7 +72,14 @@ public class MainActivity extends AppCompatActivity implements
     private String wifis[];
     private WifiInfo wifiInfo;
     private List<ScanResult> wifiScanList;
+
+    //Utils
+    private WifiGeoUtils wifiGeoUtils;
+
+    //Managers
     protected WifiManager wifiManager;
+    protected LocationManager locationManager;
+
 
 
 
@@ -81,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements
 
         //WifiData may become new class
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+
+        //WIFIGEO
+        wifiGeoUtils = new WifiGeoUtils(wifiManager, locationManager, this);
 
         //Link objects
 
@@ -182,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements
 
         ///This Code doesn't really work yet...moving to utils
 
-        //CHECK PERMISSIONS
+        //CHECK PERMISSIONS WIFI AND LAT LONG
         if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}
@@ -190,37 +203,9 @@ public class MainActivity extends AppCompatActivity implements
             }
             return;
         }
-        boolean isWiFiEnabled = false;
-        try {
-            isWiFiEnabled = wifiManager.isWifiEnabled();
-            WifiInfo info = wifiManager.getConnectionInfo();
-            if (!isWiFiEnabled) {
-                Log.d("NOT ENABLED", String.valueOf(isWiFiEnabled));
-            } else {
-                Log.d("ENABLED", String.valueOf(isWiFiEnabled));
-                registerReceiver(new BroadcastReceiver() {
-                    @Override
-                    public void onReceive(Context context, Intent intent) {
 
-                        int size;
-                        wifiInfo = wifiManager.getConnectionInfo();
-                        Log.d("TEST", wifiInfo.toString());
-                        wifiScanList = wifiManager.getScanResults();
-                        size = wifiScanList.size();
-                        wifis = new String[wifiScanList.size()];
-                        for (int i = 0; i < wifiScanList.size(); i++) {
-                            wifis[i] = ((wifiScanList.get(i)).toString());
-                        }
-                        Log.d("onrecieve", String.valueOf(size) + " Access Points Initial");
-                    }
-                }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-                wifiManager.startScan();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d("ERROR", String.valueOf(isWiFiEnabled));
-        }
-
+        //Intialize WifiGEO
+        wifiGeoUtils.itializeWifi();
 
         //<-----------updateWifiData();
 
@@ -300,9 +285,8 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public List<ScanResult> loadInBackground() {
                 try {
-
-                    List<ScanResult> apData = wifiManager.getScanResults();
-                    wifiInfo = wifiManager.getConnectionInfo();
+                    List<ScanResult> apData = wifiGeoUtils.getScanResults();
+                    wifiInfo = wifiGeoUtils.getConnectionInfo();
                     return apData;
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -359,18 +343,17 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<List<ScanResult>> loader, List<ScanResult> data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
+        //Connection info debug
         if(null == wifiInfo || wifiInfo.getSSID().equals("<unknown ssid>") || wifiInfo.getSSID().equals("")){
             Log.d("LD", "connect Info is bad");
             mConnectionInfoTextView.setText("Not Connected");
-            wifiScanList = wifiManager.getScanResults();
-            int size = wifiScanList.size();
-            Log.d("onRecieve", String.valueOf(size) + " Access Points on Scan");
+
         }else{
-            wifiScanList = wifiManager.getScanResults();
-            int size = wifiScanList.size();
-            Log.d("onRecieve", String.valueOf(size) + " Access Points on Scan");
             formatConnectionInfoText(wifiInfo);
         }
+        wifiScanList = wifiGeoUtils.getScanResults();
+        int size = wifiScanList.size();
+        Log.d("onRecieve", String.valueOf(size) + " Access Points on Scan");
         mAPAdapter.setAPData(data);
         if (null == data) {
             showScanErrorMessage();
@@ -418,6 +401,7 @@ public class MainActivity extends AppCompatActivity implements
         Class destinationClass = DetailAPActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
         intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, apItemInList);
+
         startActivity(intentToStartDetailActivity);
     }
 
@@ -469,6 +453,7 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_scan) {
+            wifiGeoUtils.startAllScan();
             invalidateData();
             getSupportLoaderManager().restartLoader(AP_LOADER_ID, null, this);
             return true;
@@ -482,6 +467,9 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
+    public void restartLoaderTest(){
+        getSupportLoaderManager().restartLoader(AP_LOADER_ID, null, this);
+    }
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
