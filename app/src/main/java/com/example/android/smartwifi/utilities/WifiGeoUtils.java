@@ -21,8 +21,8 @@ import java.util.List;
 
 public class WifiGeoUtils {
     //Managers
-    private WifiManager wifiManager;
-    private LocationManager locationManager;
+    public WifiManager wifiManager;
+    public LocationManager locationManager;
 
     //Context
     private Context context;
@@ -33,13 +33,16 @@ public class WifiGeoUtils {
     private List<ScanResult> wifiScanList;
 
 
-    public WifiGeoUtils(@NonNull WifiManager wifiManager, @NonNull LocationManager locationManager, @NonNull Context context){
-        this.wifiManager = wifiManager;
-        this.locationManager = locationManager;
+    public WifiGeoUtils(@NonNull Context context){
+        //services
+        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+
         this.context = context;
+        initializeWifi();
     }
 
-    public void itializeWifi(){
+    public void initializeWifi(){
         boolean isWiFiEnabled = false;
         try {
             isWiFiEnabled = wifiManager.isWifiEnabled();

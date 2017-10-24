@@ -106,4 +106,11 @@
     <string name="pref_number_two_value" translatable="false">2</string>
     <string name="pref_number_three_value" translatable="false">3</string>
 
+
+    <!-- Strings for Notifications and Toasts -->
+    <string name="threshold_reminder_notification_title">SMARTWifi - Signal</string>
+    <string name="threshold_reminder_notification_body">Priority Wifi is Below Threshold, Switch to a better signal lower Priority?</string>
+    <string name="main_notification_channel_name">Primary</string>
+
+
 </resources>

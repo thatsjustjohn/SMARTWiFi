@@ -18,4 +18,9 @@ public class SMARTWifiIntentService extends IntentService {
 //      COMPLETED (13) Call ReminderTasks.executeTask and pass in the action to be performed
         SMARTWifiSyncTask.executeTask(this, action);
     }
+
+    /**
+     * Created by FailSafe on 10/24/2017.
+     */
+
 }

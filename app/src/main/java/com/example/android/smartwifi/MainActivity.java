@@ -35,6 +35,10 @@ import android.widget.Toast;
 
 
 import com.example.android.smartwifi.APAdapter.APAdapterOnClickHandler;
+import com.example.android.smartwifi.sync.SMARTWifiIntentService;
+import com.example.android.smartwifi.sync.SMARTWifiSyncTask;
+import com.example.android.smartwifi.sync.SMARTWifiSyncUtils;
+import com.example.android.smartwifi.utilities.NotificationUtils;
 import com.example.android.smartwifi.utilities.WifiGeoUtils;
 
 
@@ -80,6 +84,10 @@ public class MainActivity extends AppCompatActivity implements
     protected WifiManager wifiManager;
     protected LocationManager locationManager;
 
+    //Toast
+    private Toast mToast;
+
+
 
 
 
@@ -93,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
 
         //WIFIGEO
-        wifiGeoUtils = new WifiGeoUtils(wifiManager, locationManager, this);
+        wifiGeoUtils = new WifiGeoUtils(this);
 
         //Link objects
 
@@ -204,10 +212,8 @@ public class MainActivity extends AppCompatActivity implements
             return;
         }
 
-        //Intialize WifiGEO
-        wifiGeoUtils.itializeWifi();
-
-        //<-----------updateWifiData();
+        //schedule background jobs
+        SMARTWifiSyncUtils.scheduleSMARTWifi(this);
 
     }
 
@@ -433,6 +439,16 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    public void smartWifiTask(){
+        if(mToast != null) mToast.cancel();
+        mToast = Toast.makeText(this, "Test", Toast.LENGTH_SHORT);
+        mToast.show();
+
+        Intent smartWifiIntent = new Intent(this, SMARTWifiIntentService.class);
+        smartWifiIntent.setAction(SMARTWifiSyncTask.ACTION_WIFI_THRESHOLD);
+        startService(smartWifiIntent);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -455,6 +471,12 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.action_scan) {
             wifiGeoUtils.startAllScan();
             invalidateData();
+
+            ////// DEBUGGING ///
+            // BACKGROUND TASK //
+            //smartWifiTask();
+            //NOTIFICATION //
+            //NotificationUtils.askUserToSwitchNonPriority(this);
             getSupportLoaderManager().restartLoader(AP_LOADER_ID, null, this);
             return true;
         }
