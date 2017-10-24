@@ -360,6 +360,7 @@ public class MainActivity extends AppCompatActivity implements
         wifiScanList = wifiGeoUtils.getScanResults();
         int size = wifiScanList.size();
         Log.d("onRecieve", String.valueOf(size) + " Access Points on Scan");
+        data = mAPAdapter.cleanAPData(data);
         mAPAdapter.setAPData(data);
         if (null == data) {
             showScanErrorMessage();
