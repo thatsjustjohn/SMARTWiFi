@@ -2,6 +2,11 @@
 SMARTWifi is Android applcation that manipulates the WifiMananger and LocationManager services to create a better user-wifi-experience.
 
 ## Features
+* Threshold
+* Priority
+* Geo-Fencing
+* Data-Logging
+
 ### Threshold
 Set a connect / disconnect threshold which will automatically make your Wifi connect/reassociate/disconnect when the signal(RSSI)Strength drops below or goes above the thresholds.  
 
@@ -28,3 +33,7 @@ Data logging will log all the DateTime/Wifi/GPS Data, it will actively get the G
 
 ### Maching Learning? 
 Using the data from the data logging plus user interaction, the app could easier have all of the parameters set by basic use of the user.
+
+## Authors
+Johnny Winters
+email: winters.john at gmail.com jtwyp6 at mail.missouri.edu
