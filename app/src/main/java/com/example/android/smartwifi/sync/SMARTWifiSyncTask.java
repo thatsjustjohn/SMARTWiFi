@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.example.android.smartwifi.MainActivity;
 import com.example.android.smartwifi.R;
+import com.example.android.smartwifi.data.SMARTWifiPreferences;
 import com.example.android.smartwifi.utilities.NotificationUtils;
 import com.example.android.smartwifi.utilities.WifiGeoUtils;
 
@@ -16,13 +17,13 @@ import com.example.android.smartwifi.utilities.WifiGeoUtils;
  * Created by jtwyp6 on 10/21/17.
  */
 
-public class SMARTWifiSyncTask implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SMARTWifiSyncTask{
     public static final String ACTION_WIFI_THRESHOLD = "wifi-threshold";
     public static final String ACTION_DISMISS_PRIORITY_WIFI_THRESHOLD = "priority-wifi-dismiss-threshold";
     public static final String ACTION_SWITCH_PRIORITY_WIFI_THRESHOLD = "priority-wifi-switch-threshold";
     public static final String ACTION_WIFI_ON = "wifi-on";
     public static WifiGeoUtils wifiGeoUtils;
-    public static boolean pref_threshold = true;
+    public static boolean pref_threshold;
 
 
     public static void executeTask(Context context, String action) {
@@ -40,7 +41,13 @@ public class SMARTWifiSyncTask implements SharedPreferences.OnSharedPreferenceCh
     }
 
     private static void startMonitoringBecauseWifiOn(Context context) throws InterruptedException {
+        //SETUP PREFERENCES
+        pref_threshold = SMARTWifiPreferences.isThresholdEnabled(context);
+
+        //CREATE GEOUTILS
         wifiGeoUtils = new WifiGeoUtils(context);
+        Log.d("Threshold Enabled", String.valueOf(pref_threshold));
+
         //if wifi is on, start location tracking
         //if data logging is on
         if(wifiGeoUtils.wifiManager.isWifiEnabled())
@@ -53,6 +60,9 @@ public class SMARTWifiSyncTask implements SharedPreferences.OnSharedPreferenceCh
             wifiGeoUtils.getLocation();
             if(pref_threshold){
                 wifiGeoUtils.thresholdMonitor();
+                Log.d("Threshold Enabled", "While Enabled");
+
+
             }
             Thread.sleep(1000);
         }
@@ -68,8 +78,4 @@ public class SMARTWifiSyncTask implements SharedPreferences.OnSharedPreferenceCh
         NotificationUtils.clearAllNotifications(context);
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
-
-    }
 }

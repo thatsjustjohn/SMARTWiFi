@@ -24,6 +24,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.smartwifi.MainActivity;
+import com.example.android.smartwifi.data.SMARTWifiPreferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +43,14 @@ public class WifiGeoUtils{
 
     public boolean isGPSEnabled = false;
     public boolean isNetworkEnabled = false;
-    public boolean canGetLocation = false;
+    public boolean canGetLocation = false;;
+
+    //MAIN FUNCTIONS SHARED PREFERENCES
+    public boolean isThresholdEnabled = true;
+    public boolean isPriorityEnabled = false;
+    public boolean isGeoFenceEnabled = false;
+    public boolean isDataLoggingEnabled = false;
+
     public Location location;
     public double latitidue;
     public double longitude;
@@ -66,7 +74,7 @@ public class WifiGeoUtils{
     public boolean isWiFiConnected = false;
 
     //shared preferences
-    public int threshold_disconnect = -40;
+    public int threshold_disconnect = -75;
     public int threshold_connect = -70;
 
 
@@ -75,6 +83,8 @@ public class WifiGeoUtils{
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         this.context = context;
+        //SharedPreferences
+        initSLupdateSharedPreferences();
         //initializeWifi manager and reciever
         initializeWifi();
         listener = new LocationListener() {
@@ -99,6 +109,22 @@ public class WifiGeoUtils{
 
             }
         };
+    }
+
+    private void initSLupdateSharedPreferences() {
+        isThresholdEnabled = SMARTWifiPreferences.isThresholdEnabled(context);
+        isPriorityEnabled = SMARTWifiPreferences.isPriorityEnabled(context);
+        isDataLoggingEnabled = SMARTWifiPreferences.isDataLoggingEnabled(context);
+        isGeoFenceEnabled = SMARTWifiPreferences.isGeoFenceEnabled(context);
+        threshold_connect = SMARTWifiPreferences.reconnectThreshold(context);
+        threshold_disconnect = SMARTWifiPreferences.disconnectThreshold(context);
+        Log.d("SP", String.valueOf(isThresholdEnabled) + ":"
+                + String.valueOf(isPriorityEnabled) + ":"
+                + String.valueOf(isGeoFenceEnabled) + ":"
+                + String.valueOf(isDataLoggingEnabled) + ":"
+                + String.valueOf(threshold_connect) + ":"
+                + String.valueOf(threshold_disconnect));
+
     }
 
     public void initializeWifi() {
@@ -182,36 +208,61 @@ public class WifiGeoUtils{
 
     public void thresholdMonitor(){
         wifiInfo = wifiManager.getConnectionInfo();
-        if(wifiInfo.getRssi() < threshold_disconnect && wifiInfo.getRssi() != -127){ //-127 is nothing / broken
-            //maybe reassociate networks here before disconnecting
-            wifiManager.disconnect();
-            isWiFiConnected = false;
-            Log.e("Threshold", "Disconnecting");
-        }
-        //If you are not connect, search
-        if(!isWiFiConnected){
+        isWiFiConnected = isWifiConnected();
+        //IF WIFI IS CONNECTED 1. CHECK THRESHOLD 2. REASSOCIATE 3. SEARCH FOR NEW DIFFERENT NETWORK 4. DISCONNECT
+        if(isWiFiConnected) {
+            if (wifiInfo.getRssi() < threshold_disconnect && wifiInfo.getRssi() != -127) { //-127 is nothing / broken
+                //TRY TO SEARCH FOR A BETTER NETWORK (SAME)
+                if (!wifiManager.reassociate()) {
+                    //TRY TO SEARCH FOR A BETTER NETWORK SAME OR DIFFERENT
+                    if (!searchNetworks()) {
+                        //IF FAIL DISCONNECT
+                        wifiManager.disconnect();
+                        isWiFiConnected = false;
+                        Log.e("Threshold", "Disconnecting / No Available Networks");
+                    }
+                }
+            }
+        }else //IF WIFI IS NOT CONNECTED (SEARCH)
+        {
             Log.e("Threshold", "Searching to Reconnect");
             searchNetworks();
         }
 
     }
 
-    public void searchNetworks() {
+    public boolean searchNetworks() {
+        initSLupdateSharedPreferences();
+        ScanResult apToConnectTo = null;
         wifiManager.startScan();
         wifiScanList = getScanResults();
+        //Holds matching AP AND WIFI CONFIG
         List<ScanResult> matchingAP = new ArrayList<ScanResult>();
+        List<WifiConfiguration> matchingConfig = new ArrayList<WifiConfiguration>();
         configuredWifiList = wifiManager.getConfiguredNetworks();
         int count = 0;
+
+        //Parse Scan list and clean up AP information
         Iterator<ScanResult> scanIterator = wifiScanList.iterator();
         while (scanIterator.hasNext()) {
             ScanResult scanResult = scanIterator.next();
             if (scanResult.SSID.equals("") || scanResult.SSID.equals("<unknown ssid>") || scanResult.SSID == null || scanResult.level < threshold_connect) {
                 scanIterator.remove();
                 count++;
-            }/*else{
+            }else {
+                if (isThresholdEnabled) {
+                    if (scanResult.level < threshold_connect){
+                        scanIterator.remove();
+                        count++;
+                    }
+                }
+            }
+                /*else{
                 Log.d("AP",scanResult.toString());
             }*/
         }
+
+        //Compare configured list to cleaned up wifiAPlist and
         Log.d("WifiScanReconnect", "cleaned up " + String.valueOf(count) + " entries");
         if (configuredWifiList != null && wifiScanList != null) {
             //Log.d("CF", configuredWifiList.toString());
@@ -221,14 +272,47 @@ public class WifiGeoUtils{
                     Log.d("Matchy", singleAP.SSID.toString() + " " + knownAP.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""));
                     if (singleAP.SSID.toString().equals(knownAP.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
                         matchingAP.add(singleAP);
+                        matchingConfig.add(knownAP);
                         Log.d("AP2", singleAP.toString());
                     }
                 }
             }
         }
-        if (matchingAP != null) {
+
+        //IF NETWORKS MATCHES ARE FOUND
+        if (matchingAP != null && !matchingAP.isEmpty()) {
             Log.d("Final AP", matchingAP.toString());
+            //Check For Priority if no priority take the highest signal
+            if(isPriorityEnabled){
+                Log.d("Priority", "Code to make check priority list");
+            }else{
+                boolean firstPass = true;
+                for (ScanResult singleAP : matchingAP){
+                    if(firstPass){
+                        firstPass = false;
+                        apToConnectTo = singleAP;
+                    }
+                    if(singleAP.level > apToConnectTo.level){
+                        apToConnectTo = singleAP;
+                    }
+
+                }
+                Log.d("ATTEMPT Connect", apToConnectTo.toString());
+                for (WifiConfiguration knownConfig : matchingConfig) {
+                    if (apToConnectTo.SSID.toString().equals(knownConfig.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
+                        Log.d("CONNECTING TO", apToConnectTo.toString());
+                        wifiManager.enableNetwork(knownConfig.networkId, true);
+                        isWiFiConnected = isWifiConnected();
+                        return true;
+                    }
+                }
+
+            }
+        }else{
+            Log.d("Final AP", "NO NETWORKS FOUND");
+            return false;
         }
+        return false;
     }
 
     public boolean isWifiConnected(){
