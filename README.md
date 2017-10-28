@@ -35,5 +35,5 @@ Data logging will log all the DateTime/Wifi/GPS Data, it will actively get the G
 Using the data from the data logging plus user interaction, the app could easier have all of the parameters set by basic use of the user.
 
 ## Authors
-Johnny Winters
-email: winters.john at gmail.com jtwyp6 at mail.missouri.edu
+* **Johnny Winters**
+Email: winters.john at gmail.com jtwyp6 at mail.missouri.edu
