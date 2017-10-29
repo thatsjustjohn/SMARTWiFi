@@ -40,6 +40,11 @@
     <string name="pref_threshold_disconnect_summary">RSSI Strength to connect at. The further from zero is weaker (-75 Default)</string>
 
     <!-- PRIORITY -->
+
+    <string name="pref_priority_list_button_label">Priority List</string>
+    <string name="pref_priority_list_button_key">geo_priority_button_key</string>
+    <string name="pref_priority_list_button_summary">Click to open Priority List</string>
+
     <!-- SHOULD BE DATABASE -->
 
 
@@ -47,12 +52,21 @@
     <!-- DATABASE -->
 
 
-    <!-- GEO FENCING DROP DOWN -->
+    <!-- GEO FENCING & BUTTONS -->
 
     <string name="pref_geo_fence_lat_label">Geo Fence Lat</string>
     <string name="pref_geo_fence_long_label">Geo Fence Long</string>
     <string name="pref_geo_fence_radius_label">Geo Fence Radius</string>
 
+    <string name="pref_geo_fence_list_button_label">Geo Fence List</string>
+    <string name="pref_geo_fence_list_button_key">geo_fence_list_button_key</string>
+    <string name="pref_geo_fence_list_button_summary">Click to open Geo Fence List</string>
+
+    <string name="pref_geo_fence_map_button_label">Map</string>
+    <string name="pref_geo_fence_map_button_key">geo_fence_map_button_key</string>
+    <string name="pref_geo_fence_map_button_summary">Click to open Geo Fence Map</string>
+
+    <!-- PENDING DELETE -->
     <!-- GEO FENCING 1 -->
     <string name="pref_geo_fence_one_label">Geo Fence 1</string>
     <string name="pref_geo_fence_one_key" translatable="false">geo_fence_1</string>
@@ -111,6 +125,16 @@
     <string name="threshold_reminder_notification_title">SMARTWifi - Signal</string>
     <string name="threshold_reminder_notification_body">Priority Wifi is Below Threshold, Switch to a better signal lower Priority?</string>
     <string name="main_notification_channel_name">Primary</string>
+    <string name="title_activity_geo_fence">GeoFenceActivity</string>
+
+    <!-- ADD GEO FENCE -->
+    <string name="get_location_button">Get Current Location</string>
+    <string name="add_button">Add Geo Fence</string>
+    <string name="edit_geo_fence_description">Enter name of Geo Fence</string>
+    <string name="edit_geo_fence_latitude">Enter the latitude</string>
+    <string name="edit_geo_fence_longitude">Enter the longitude</string>
+    <string name="edit_geo_fence_radius">Enter the radius</string>
+    <string name="geo_fence_string">Lat/Long/Radius</string>
 
 
 </resources>

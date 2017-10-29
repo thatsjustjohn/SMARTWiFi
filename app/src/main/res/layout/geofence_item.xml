@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    This linear layout contains a single item in the list of tasks displayed in the MainActivity
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="com.example.android.smartwifi.GeoFenceActivity">
+
+
+    <!-- TextView that displays the description of a task -->
+    <TextView
+        android:id="@+id/geofenceDescription"
+        android:paddingTop="16dp"
+        android:paddingLeft="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="22dp"
+        style="@style/TextAppearance.AppCompat.Medium" />
+    <!--
+      This horizontal linear layout displays the description and priority of a task
+      in a single horizontal line
+  -->
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp">
+
+        <!-- TextView that displays the latitude of a geofence -->
+        <!-- TextView that displays the latitude of a geofence -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lat: "
+            style="@style/TextAppearance.AppCompat.Medium" />
+        <TextView
+            android:id="@+id/latitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Medium" />
+
+        <!-- An empty view for spacing out the latitude and longitude views -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- TextView that displays the longtiude of a geofence -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Long: "
+            style="@style/TextAppearance.AppCompat.Medium" />
+        <TextView
+            android:id="@+id/longitude"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Medium" />
+
+        <!-- An empty view for spacing out the description and priority views -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- TextView that displays the longtiude of a geofence -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Radius: "
+            style="@style/TextAppearance.AppCompat.Medium" />
+        <TextView
+            android:id="@+id/radius"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Medium" />
+
+    </LinearLayout>
+
+    <!-- A gray divider line at the bottom of each task -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+</LinearLayout>

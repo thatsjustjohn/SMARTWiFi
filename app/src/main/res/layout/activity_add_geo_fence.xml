@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="16dp"
+    android:paddingEnd="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp">
+
+
+    <!-- TextView and FrameLayout (which contains buttons) for Priority Selection -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:text="ADD GEO FENCE"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- EditText for getting geo fence description input -->
+    <EditText
+        android:id="@+id/editTextGeoFenceDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:hint="@string/edit_geo_fence_description"
+        android:paddingBottom ="16dp"/>
+
+    <!-- TextView and FrameLayout (which contains buttons) for Priority Selection -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:text="@string/geo_fence_string"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Add button -->
+    <Button
+        android:id="@+id/getLocationButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/get_location_button"
+        style="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@android:color/primary_text_dark"
+        android:background="@color/colorPrimary"
+        android:onClick="onClickGetLocation"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:weightSum="3">
+
+            <!-- EditText for getting task description input -->
+            <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    style="@style/TextAppearance.AppCompat.Medium"
+                    android:text="Lat:"
+                    android:textSize="22dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom ="16dp"/>
+
+                <EditText
+                    android:id="@+id/editTextGeoFenceLatitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:hint="@string/edit_geo_fence_latitude"
+                    android:paddingBottom ="16dp"/>
+            </LinearLayout>
+
+            <!-- EditText for getting task description input -->
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    style="@style/TextAppearance.AppCompat.Medium"
+                    android:text="Long:"
+                    android:textSize="22dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom ="16dp"/>
+                <EditText
+                    android:id="@+id/editTextGeoFenceLongitude"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:hint="@string/edit_geo_fence_longitude"
+                    android:paddingBottom ="16dp"/>
+            </LinearLayout>
+
+
+            <!-- EditText for getting task description input -->
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    style="@style/TextAppearance.AppCompat.Medium"
+                    android:text="Radius:"
+                    android:textSize="22dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom ="16dp"/>
+                <EditText
+                    android:id="@+id/editTextGeoFenceRadius"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:hint="@string/edit_geo_fence_radius"
+                    android:paddingBottom ="16dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <!-- Add button -->
+    <Button
+        android:id="@+id/addButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/add_button"
+        style="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@android:color/primary_text_dark"
+        android:background="@color/colorPrimary"
+        android:onClick="onClickAddGeoFence"/>
+
+
+</LinearLayout>

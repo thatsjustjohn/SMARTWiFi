@@ -85,7 +85,7 @@ public class WifiGeoUtils{
         this.context = context;
         //SharedPreferences
         initSLupdateSharedPreferences();
-        //initializeWifi manager and reciever
+        //initializeWifi manager and receiver
         initializeWifi();
         listener = new LocationListener() {
             @Override

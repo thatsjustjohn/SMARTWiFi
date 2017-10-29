@@ -43,7 +43,9 @@
             android:summaryOn="@string/pref_show_true"
             android:summaryOff="@string/pref_show_false"/>
         <Preference
-            android:title="Open Priority List" />
+            android:title="@string/pref_priority_list_button_label"
+            android:key="@string/pref_priority_list_button_key"
+            android:summary="@string/pref_priority_list_button_summary"/>
     </PreferenceCategory>
 
 
@@ -57,6 +59,16 @@
             android:summaryOn="@string/pref_show_true"
             android:summaryOff="@string/pref_show_false" />
 
+        <Preference
+            android:title="@string/pref_geo_fence_list_button_label"
+            android:key="@string/pref_geo_fence_list_button_key"
+            android:summary="@string/pref_geo_fence_list_button_summary"/>
+
+        <Preference
+            android:title="@string/pref_geo_fence_map_button_label"
+            android:key="@string/pref_geo_fence_map_button_key"
+            android:summary="@string/pref_geo_fence_map_button_summary"/>
+    <!--
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/pref_number_option_labels"
@@ -64,7 +76,6 @@
             android:key="@string/pref_number_of_geo_fence_key"
             android:title="@string/pref_number_of_geo_fence_label" />
 
-        <!-- GEO FENCE 1 -->
 
         <EditTextPreference
             android:defaultValue="@string/pref_geo_fence_one_lat_default"
@@ -88,8 +99,6 @@
             android:singleLine="true"/>
 
 
-        <!-- GEO FENCE 2 -->
-
         <EditTextPreference
             android:defaultValue="@string/pref_geo_fence_two_lat_default"
             android:key="@string/pref_geo_fence_two_lat_key"
@@ -112,9 +121,6 @@
             android:singleLine="true"/>
 
 
-
-        <!-- GEO FENCE 3 -->
-
         <EditTextPreference
             android:defaultValue="@string/pref_geo_fence_three_lat_default"
             android:key="@string/pref_geo_fence_three_lat_key"
@@ -135,7 +141,7 @@
             android:title="@string/pref_geo_fence_radius_label"
             android:inputType="text"
             android:singleLine="true"/>
-
+    -->
     </PreferenceCategory>
 
 

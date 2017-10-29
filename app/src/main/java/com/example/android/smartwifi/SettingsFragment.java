@@ -1,5 +1,6 @@
 package com.example.android.smartwifi;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.CheckBoxPreference;
@@ -8,6 +9,7 @@ import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceCategory;
 import android.support.v7.preference.PreferenceFragmentCompat;
 import android.support.v7.preference.PreferenceScreen;
+import android.util.Log;
 
 /**
  * Created by jtwyp6 on 7/21/17.
@@ -63,6 +65,41 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         addPreferencesFromResource(R.xml.pref_general);
         SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
         PreferenceScreen prefScreen = getPreferenceScreen();
+
+        Preference priorityButton = findPreference(getString(R.string.pref_priority_list_button_key));
+        priorityButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //code for what you want it to do
+                Log.d("Clicked", "Clickled Priority");
+                return true;
+            }
+        });
+
+        Preference geoFenceButton = findPreference(getString(R.string.pref_geo_fence_list_button_key));
+        geoFenceButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //code for what you want it to do
+                Log.d("Clicked", "Clickled Geo Fence List");
+                Intent startGeoFenceActivity = new Intent(SettingsFragment.this.getActivity(), GeoFenceActivity.class);
+                startActivity(startGeoFenceActivity);
+                return true;
+            }
+        });
+
+        Preference geoFenceMapButton = findPreference(getString(R.string.pref_geo_fence_map_button_key));
+        geoFenceMapButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //code for what you want it to do
+                Log.d("Clicked", "Clickled Map");
+                return true;
+            }
+        });
+
+
+
 
         int count = prefScreen.getPreferenceCount();
         for(int i = 0; i < count; i++){
