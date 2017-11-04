@@ -44,17 +44,17 @@ public class AddGeoFenceActivity extends AppCompatActivity {
             return;
         }
         String geoFenceLatitude = ((EditText) findViewById(R.id.editTextGeoFenceLatitude)).getText().toString();
-        if (geoFenceDescription.length() == 0) {
+        if (geoFenceLatitude.length() == 0) {
             missingInformationSnackBar(view);
             return;
         }
         String geoFenceLongitude = ((EditText) findViewById(R.id.editTextGeoFenceLongitude)).getText().toString();
-        if (geoFenceDescription.length() == 0) {
+        if (geoFenceLongitude.length() == 0) {
             missingInformationSnackBar(view);
             return;
         }
         String geoFenceRadius = ((EditText) findViewById(R.id.editTextGeoFenceRadius)).getText().toString();
-        if (geoFenceDescription.length() == 0) {
+        if (geoFenceRadius.length() == 0) {
             missingInformationSnackBar(view);
             return;
         }

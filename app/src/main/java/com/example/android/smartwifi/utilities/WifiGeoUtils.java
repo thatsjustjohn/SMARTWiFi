@@ -68,6 +68,7 @@ public class WifiGeoUtils{
     private WifiInfo wifiInfo;
     private List<ScanResult> wifiScanList;
     private List<WifiConfiguration> configuredWifiList;
+    private BroadcastReceiver wifiReciever;
 
     //variables
     public boolean isWiFiEnabled  = false;
@@ -136,7 +137,7 @@ public class WifiGeoUtils{
                 Log.d("NOT ENABLED", String.valueOf(isWiFiEnabled));
             } else {
                 Log.d("ENABLED", String.valueOf(isWiFiEnabled));
-                context.registerReceiver(new BroadcastReceiver() {
+                context.registerReceiver(wifiReciever = new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
 
@@ -154,6 +155,10 @@ public class WifiGeoUtils{
             Log.d("ERROR", String.valueOf(isWiFiEnabled));
         }
 
+    }
+
+    public void unregisterReciever(){
+        context.unregisterReceiver(wifiReciever);
     }
 
     public List<ScanResult> getScanResults() {

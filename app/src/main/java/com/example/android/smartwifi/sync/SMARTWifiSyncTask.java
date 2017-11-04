@@ -4,8 +4,12 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
+import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
 
 import com.example.android.smartwifi.MainActivity;
 import com.example.android.smartwifi.R;
@@ -41,6 +45,9 @@ public class SMARTWifiSyncTask{
     }
 
     private static void startMonitoringBecauseWifiOn(Context context) throws InterruptedException {
+
+        //Monitoring
+
         //SETUP PREFERENCES
         pref_threshold = SMARTWifiPreferences.isThresholdEnabled(context);
 
@@ -70,6 +77,8 @@ public class SMARTWifiSyncTask{
         wifiGeoUtils.stopLocationTracking();
         //while wifi is enable run code here.
     }
+
+
 
 
     private static void handleWifiThreshold(Context context) {

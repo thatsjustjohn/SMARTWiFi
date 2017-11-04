@@ -94,6 +94,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             public boolean onPreferenceClick(Preference preference) {
                 //code for what you want it to do
                 Log.d("Clicked", "Clickled Map");
+                Intent startMapActivity = new Intent(SettingsFragment.this.getActivity(), MapsActivity.class);
+                startActivity(startMapActivity);
                 return true;
             }
         });

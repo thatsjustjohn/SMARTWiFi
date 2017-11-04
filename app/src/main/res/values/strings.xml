@@ -135,6 +135,7 @@
     <string name="edit_geo_fence_longitude">Enter the longitude</string>
     <string name="edit_geo_fence_radius">Enter the radius</string>
     <string name="geo_fence_string">Lat/Long/Radius</string>
+    <string name="title_activity_maps">Map</string>
 
 
 </resources>

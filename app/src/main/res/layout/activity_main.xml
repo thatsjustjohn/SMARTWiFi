@@ -13,9 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp">
+        android:padding="10dp">
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,15 +75,29 @@
             />
     </LinearLayout>
 
+    <!-- A gray divider line at the bottom of each task -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv_current_wifi"
+        android:paddingLeft="16dp"
         android:textSize="20sp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+
         android:text="Wifi: TigerWifi\nStrength: Your Momma"/>
+
+    <!-- A gray divider line at the bottom of each task -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 
     <FrameLayout
         android:layout_width="match_parent"

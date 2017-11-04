@@ -38,6 +38,7 @@ import com.example.android.smartwifi.APAdapter.APAdapterOnClickHandler;
 import com.example.android.smartwifi.sync.SMARTWifiIntentService;
 import com.example.android.smartwifi.sync.SMARTWifiSyncTask;
 import com.example.android.smartwifi.sync.SMARTWifiSyncUtils;
+import com.example.android.smartwifi.utilities.GeoFenceUtils;
 import com.example.android.smartwifi.utilities.NotificationUtils;
 import com.example.android.smartwifi.utilities.WifiGeoUtils;
 
@@ -216,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements
         SMARTWifiSyncUtils.scheduleSMARTWifi(this);
 
     }
+
 
 
     private void setupSharedPreferences() {
@@ -453,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        wifiGeoUtils.unregisterReciever();
         /* Unregister MainActivity as an OnPreferenceChangedListener to avoid any memory leaks. */
         PreferenceManager.getDefaultSharedPreferences(this)
                 .unregisterOnSharedPreferenceChangeListener(this);
@@ -476,6 +478,9 @@ public class MainActivity extends AppCompatActivity implements
             ////// DEBUGGING ///
             // BACKGROUND TASK //
             //smartWifiTask();
+            GeoFenceUtils.getInstance().loadGeoFencesFromDB(this);
+            ///GeoFenceUtils geoFenceUtils = new GeoFenceUtils(this);
+            //geoFenceUtils.loadGeoFencesFromDB();
             //NOTIFICATION //
             //NotificationUtils.askUserToSwitchNonPriority(this);
             getSupportLoaderManager().restartLoader(AP_LOADER_ID, null, this);

@@ -16,9 +16,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.android.smartwifi.data.GeoFenceContract;
+import com.example.android.smartwifi.utilities.GeoFenceUtils;
 
 public class GeoFenceActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -32,10 +36,15 @@ public class GeoFenceActivity extends AppCompatActivity implements
     private GeoFenceCursorAdapter mAdapter;
     RecyclerView mRecyclerView;
 
+    private ProgressBar mLoadingIndicator;
+    private TextView mErrorMessage;
+    private int mPosition = RecyclerView.NO_POSITION;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_geo_fence);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Set the RecyclerView to its corresponding view
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerViewGeoFences);
@@ -43,6 +52,11 @@ public class GeoFenceActivity extends AppCompatActivity implements
         // Set the layout for the RecyclerView to be a linear layout, which measures and
         // positions items within a RecyclerView into a linear list
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+
+        mErrorMessage = (TextView) findViewById(R.id.tv_geo_error_display);
+
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_geo_loading_indicator);
 
         // Initialize the adapter and attach it to the RecyclerView
         mAdapter = new GeoFenceCursorAdapter(this);
@@ -100,6 +114,11 @@ public class GeoFenceActivity extends AppCompatActivity implements
                         .setAction("Action", null).show();*/
             }
         });
+
+
+        //show loading
+        showGeoFenceLoading();
+
 
         /*
          Ensure a loader is initialized and active. If the loader doesn't already exist, one is
@@ -191,6 +210,19 @@ public class GeoFenceActivity extends AppCompatActivity implements
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         // Update the data that the adapter uses to create ViewHolders
         mAdapter.swapCursor(data);
+
+        if (mPosition == RecyclerView.NO_POSITION){
+            mPosition = 0;
+        }
+
+        mRecyclerView.smoothScrollToPosition(mPosition);
+
+        if (data.getCount() != 0){
+            showGeoFenceDataView();
+        }else{
+            mErrorMessage.setText("Please click the add button\n To create a new GeoFence.");
+            showGeoFenceError();
+        }
     }
 
 
@@ -206,6 +238,37 @@ public class GeoFenceActivity extends AppCompatActivity implements
         mAdapter.swapCursor(null);
     }
 
+
+
+    private void showGeoFenceDataView(){
+        mErrorMessage.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showGeoFenceLoading(){
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mErrorMessage.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void showGeoFenceError(){
+        mRecyclerView.setVisibility(View.INVISIBLE);
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        mErrorMessage.setVisibility(View.VISIBLE);
+    }
+
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == android.R.id.home) {
+            onBackPressed();
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 
 }
