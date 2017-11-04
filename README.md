@@ -26,13 +26,22 @@ Currently Android doesn't allow this and whichever network first comes in range 
 #### To be implemented
 STANDOFF if a user selects something non-priority / priority is disabled / priority is put in a standoff mode
 
-### Geo-Fencing (To be implemented)
+### Geo-Fencing (To be implemented | Adding/Deleted is implemented editing is not)
+
+Geo-Fencing will allow the user to add locations that will trigger their Wifi to turn on and off when they enter / exit the fence.  The fence is created as a circle with the center being at the lat/long and the radius as specified by the user.
+
+The user will add Geo-locations(lat/long) and radius within the app, which will be stored into an SQlite database. 
+
+#### To be implemented
+STANDOFF if a user manually turns on or off their wifi Geo-fencing will be put in a standoff mode.
 
 ### Data-Logging 
 Data logging will log all the DateTime/Wifi/GPS Data, it will actively get the GPS data and Wifi Connection info (the wifi you are currently associated with) as well as period scans of all the networks (might implement this in a different but similar file)
 
 ### Maching Learning? 
 Using the data from the data logging plus user interaction, the app could easier have all of the parameters set by basic use of the user.
+
+STANDOFF data will be collected in a seperate area besides data logging to monitor user actions.
 
 ## Authors
 * **Johnny Winters**
