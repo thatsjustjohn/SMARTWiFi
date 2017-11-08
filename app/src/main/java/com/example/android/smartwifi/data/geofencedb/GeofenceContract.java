@@ -1,4 +1,4 @@
-package com.example.android.smartwifi.data;
+package com.example.android.smartwifi.data.geofencedb;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
  * Created by jtwyp6 on 10/29/17.
  */
 
-public class GeoFenceContract {
+public class GeofenceContract {
 
     /* Add content provider constants to the Contract
      Clients need to know how to access the task data, and it's your job to provide

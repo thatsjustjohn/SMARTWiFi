@@ -1,18 +1,13 @@
 package com.example.android.smartwifi;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.SystemClock;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.AsyncTaskLoader;
@@ -25,7 +20,6 @@ import android.os.Bundle;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -38,12 +32,10 @@ import com.example.android.smartwifi.APAdapter.APAdapterOnClickHandler;
 import com.example.android.smartwifi.sync.SMARTWifiIntentService;
 import com.example.android.smartwifi.sync.SMARTWifiSyncTask;
 import com.example.android.smartwifi.sync.SMARTWifiSyncUtils;
-import com.example.android.smartwifi.utilities.GeoFenceUtils;
-import com.example.android.smartwifi.utilities.NotificationUtils;
+import com.example.android.smartwifi.utilities.GeofenceUtils;
 import com.example.android.smartwifi.utilities.WifiGeoUtils;
 
 
-import java.net.URL;
 import java.util.List;
 
 
@@ -72,6 +64,10 @@ public class MainActivity extends AppCompatActivity implements
     private static final int AP_LOADER_ID = 0;
 
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
+
+    static public boolean geofencesAlreadyRegistered = false;
+    public static String TAG2 = "DEBUG_GEO";
+
 
     //Data
     private String wifis[];
@@ -215,6 +211,11 @@ public class MainActivity extends AppCompatActivity implements
 
         //schedule background jobs
         SMARTWifiSyncUtils.scheduleSMARTWifi(this);
+
+
+        //service
+        startService(new Intent(this, SMARTWifiIntentService.class));
+
 
     }
 
@@ -478,8 +479,8 @@ public class MainActivity extends AppCompatActivity implements
             ////// DEBUGGING ///
             // BACKGROUND TASK //
             //smartWifiTask();
-            GeoFenceUtils.getInstance().loadGeoFencesFromDB(this);
-            ///GeoFenceUtils geoFenceUtils = new GeoFenceUtils(this);
+            GeofenceUtils.getInstance().loadGeoFencesFromDB(this);
+            ///GeofenceUtils geoFenceUtils = new GeofenceUtils(this);
             //geoFenceUtils.loadGeoFencesFromDB();
             //NOTIFICATION //
             //NotificationUtils.askUserToSwitchNonPriority(this);

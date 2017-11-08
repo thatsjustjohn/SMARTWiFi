@@ -2,11 +2,9 @@ package com.example.android.smartwifi;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -21,8 +19,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.android.smartwifi.data.GeoFenceContract;
-import com.example.android.smartwifi.utilities.GeoFenceUtils;
+import com.example.android.smartwifi.data.geofencedb.GeofenceContract;
 
 public class GeoFenceActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -85,7 +82,7 @@ public class GeoFenceActivity extends AppCompatActivity implements
 
                 // Build appropriate uri with String row id appended
                 String stringId = Integer.toString(id);
-                Uri uri = GeoFenceContract.TaskEntry.CONTENT_URI;
+                Uri uri = GeofenceContract.TaskEntry.CONTENT_URI;
                 uri = uri.buildUpon().appendPath(stringId).build();
 
                 // COMPLETED (2) Delete a single row of data using a ContentResolver
@@ -177,11 +174,11 @@ public class GeoFenceActivity extends AppCompatActivity implements
                 // [Hint] use a try/catch block to catch any errors in loading data
 
                 try {
-                    return getContentResolver().query(GeoFenceContract.TaskEntry.CONTENT_URI,
+                    return getContentResolver().query(GeofenceContract.TaskEntry.CONTENT_URI,
                             null,
                             null,
                             null,
-                            GeoFenceContract.TaskEntry.COLUMN_RADIUS);
+                            GeofenceContract.TaskEntry.COLUMN_RADIUS);
 
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to asynchronously load data.");
@@ -220,7 +217,7 @@ public class GeoFenceActivity extends AppCompatActivity implements
         if (data.getCount() != 0){
             showGeoFenceDataView();
         }else{
-            mErrorMessage.setText("Please click the add button\n To create a new GeoFence.");
+            mErrorMessage.setText("Please click the add button\n To create a new SGeofence.");
             showGeoFenceError();
         }
     }

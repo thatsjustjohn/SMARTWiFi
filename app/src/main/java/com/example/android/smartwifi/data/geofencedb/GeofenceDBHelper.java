@@ -1,4 +1,4 @@
-package com.example.android.smartwifi.data;
+package com.example.android.smartwifi.data.geofencedb;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by jtwyp6 on 10/29/17.
  */
 
-public class GeoFenceDBHelper extends SQLiteOpenHelper {
+public class GeofenceDBHelper extends SQLiteOpenHelper {
 
     // The name of the database
     private static final String DATABASE_NAME = "tasksDb.db";
@@ -18,7 +18,7 @@ public class GeoFenceDBHelper extends SQLiteOpenHelper {
 
 
     // Constructor
-    GeoFenceDBHelper(Context context) {
+    public GeofenceDBHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
     }
 
@@ -30,12 +30,12 @@ public class GeoFenceDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         // Create tasks table (careful to follow SQL formatting rules)
-        final String CREATE_TABLE = "CREATE TABLE "  + GeoFenceContract.TaskEntry.TABLE_NAME + " (" +
-                GeoFenceContract.TaskEntry._ID                + " INTEGER PRIMARY KEY, " +
-                GeoFenceContract.TaskEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
-                GeoFenceContract.TaskEntry.COLUMN_LATITUDE   + " TEXT NOT NULL, " +
-                GeoFenceContract.TaskEntry.COLUMN_LONGITUDE   + " TEXT NOT NULL, " +
-                GeoFenceContract.TaskEntry.COLUMN_RADIUS   + " TEXT NOT NULL);";
+        final String CREATE_TABLE = "CREATE TABLE "  + GeofenceContract.TaskEntry.TABLE_NAME + " (" +
+                GeofenceContract.TaskEntry._ID                + " INTEGER PRIMARY KEY, " +
+                GeofenceContract.TaskEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
+                GeofenceContract.TaskEntry.COLUMN_LATITUDE   + " TEXT NOT NULL, " +
+                GeofenceContract.TaskEntry.COLUMN_LONGITUDE   + " TEXT NOT NULL, " +
+                GeofenceContract.TaskEntry.COLUMN_RADIUS   + " TEXT NOT NULL);";
 
         db.execSQL(CREATE_TABLE);
     }
@@ -47,7 +47,7 @@ public class GeoFenceDBHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + GeoFenceContract.TaskEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + GeofenceContract.TaskEntry.TABLE_NAME);
         onCreate(db);
     }
 }

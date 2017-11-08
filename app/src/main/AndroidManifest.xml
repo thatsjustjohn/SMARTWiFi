@@ -52,8 +52,11 @@
             </intent-filter>
         </service>
 
+
+        <service android:name=".sync.GeofenceTransitionIntentService" />
+
         <provider
-            android:name=".data.GeoFenceContentProvider"
+            android:name=".data.geofencedb.GeofenceContentProvider"
             android:authorities="com.example.android.smartwifi"
             android:exported="false" />
 

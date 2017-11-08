@@ -1,49 +1,69 @@
 package com.example.android.smartwifi.utilities;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.location.GpsStatus;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.sip.SipAudioCall;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Looper;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.example.android.smartwifi.MainActivity;
+
+import com.example.android.smartwifi.sync.GeofenceTransitionIntentService;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
+
 import com.example.android.smartwifi.data.SMARTWifiPreferences;
+import com.example.android.smartwifi.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jtwyp6 on 10/21/17.
  */
 
-public class WifiGeoUtils{
+public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        com.google.android.gms.location.LocationListener,
+        ResultCallback<Status> {
     //Managers
     public WifiManager wifiManager;
     public LocationManager locationManager;
     public LocationListener listener;
 
+    protected GoogleApiClient mGoogleApiClient;
+    protected LocationRequest mLocationRequest;
+
     public boolean isGPSEnabled = false;
     public boolean isNetworkEnabled = false;
-    public boolean canGetLocation = false;;
+    public boolean canGetLocation = false;
+    ;
 
     //MAIN FUNCTIONS SHARED PREFERENCES
     public boolean isThresholdEnabled = true;
@@ -56,9 +76,12 @@ public class WifiGeoUtils{
     public double longitude;
 
     //parameters for location
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 500;
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 20;
     private static final long MIN_TIME_BETWEEN_UPDATES = 0;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS / 5;
 
+    private PendingIntent mPendingIntent;
 
     //Context
     private Context context;
@@ -68,31 +91,54 @@ public class WifiGeoUtils{
     private WifiInfo wifiInfo;
     private List<ScanResult> wifiScanList;
     private List<WifiConfiguration> configuredWifiList;
-    private BroadcastReceiver wifiReciever;
+    private BroadcastReceiver wifiReceiver;
+
+    protected HashMap<String, SGeofence> mGeofenceMap = new HashMap<String, SGeofence>();
+    protected ArrayList<Geofence> mGeofenceList;
 
     //variables
-    public boolean isWiFiEnabled  = false;
+    public boolean isWiFiEnabled = false;
     public boolean isWiFiConnected = false;
+    public boolean registeredGeo = false;
+
 
     //shared preferences
     public int threshold_disconnect = -75;
     public int threshold_connect = -70;
-
 
     public WifiGeoUtils(@NonNull Context context) {
         //services
         wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         this.context = context;
+
+
+        //Geolocation setup?
+        //GET Geo Fences
+        GeofenceUtils.getInstance().loadGeoFencesFromDB(context);
+        mGeofenceMap = GeofenceUtils.getInstance().getGeofences();
+        //register geofences
+
+        //BUILD API
+        buildGoogleApiClient();
+
+
+        mGoogleApiClient.connect();
+
         //SharedPreferences
         initSLupdateSharedPreferences();
+
         //initializeWifi manager and receiver
         initializeWifi();
+
         listener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 Log.d("GPS", "on location change event");
                 Log.d("On Changed", String.valueOf(location));
+                if (!registeredGeo) {
+                    registerGeofences();
+                }
             }
 
             @Override
@@ -111,6 +157,154 @@ public class WifiGeoUtils{
             }
         };
     }
+
+    //GEO LOCATION UTIL SETUP
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(context)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        createLocationRequest();
+    }
+
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(500);
+        mLocationRequest
+                .setFastestInterval(500);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    //
+    public void geoOnStart() {
+        if (!mGoogleApiClient.isConnecting() || !mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    public void geoOnStop() {
+        if (mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    public void registerGeofences() {
+        if (!mGoogleApiClient.isConnected()) {
+            Log.d("REGISTERGEO", String.valueOf(R.string.not_connected));
+            return;
+        }
+
+        GeofenceUtils.getInstance().loadGeoFencesFromDB(context);
+        mGeofenceMap = GeofenceUtils.getInstance().getGeofences();
+
+        //IF NO GEO LOCATIONS
+        if (mGeofenceMap.isEmpty()) return;
+
+
+        //BUILD AND ADD MAPS TO GEOFENCING REQUEST
+        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
+        for (Map.Entry<String, SGeofence> item : mGeofenceMap.entrySet()) {
+
+            SGeofence smartgeo = item.getValue();
+
+            geofencingRequestBuilder.addGeofence(smartgeo.buildGeofence());
+            //BUILT ONE GEOLOCATION
+            Log.d("REGISTERGEO", "BUILT A GEO LOCATION");
+        }
+
+        GeofencingRequest geofencingRequest = geofencingRequestBuilder.build();
+
+        mPendingIntent = requestPendingIntent();
+
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient,
+                geofencingRequest,
+                mPendingIntent).setResultCallback(this);
+
+        registeredGeo = true;
+    }
+
+    private PendingIntent requestPendingIntent() {
+
+        if (null != mPendingIntent) {
+
+            return mPendingIntent;
+        } else {
+
+            Intent intent = new Intent(context, GeofenceTransitionIntentService.class);
+            return PendingIntent.getService(context, 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.i("GEO ONCONNECTED", "Connected to GoogleApiClient");
+        startLocationUpdates();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i("GEO ONFAILED",
+                "Connection failed: ConnectionResult.getErrorCode() = "
+                        + connectionResult.getErrorCode());
+    }
+
+    @Override
+    public void onResult(@NonNull Status status) {
+
+        if (status.isSuccess()) {
+            Toast.makeText(context,
+                    "Geofences Added", Toast.LENGTH_SHORT)
+                    .show();
+        } else {
+            registeredGeo = false;
+            String errorMessage = GeofenceErrorMessagesUtils.getErrorString(context, status.getStatusCode());
+            Toast.makeText(context, errorMessage,
+                    Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+     /* Location stuff(fused location for getting updates for API) */
+
+    public void startLocationUpdates(){
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
+    }
+
+    public void stopLocationUpdates(){
+        LocationServices.FusedLocationApi.removeLocationUpdates(
+                mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d("GEO",
+                "new location : " + location.getLatitude() + ", "
+                        + location.getLongitude() + ". "
+                        + location.getAccuracy());
+        GeofenceTransitionIntentService.accuracy = (int)location.getAccuracy();
+
+        if (!registeredGeo) {
+            registerGeofences();
+        }
+    }
+
 
     private void initSLupdateSharedPreferences() {
         isThresholdEnabled = SMARTWifiPreferences.isThresholdEnabled(context);
@@ -137,7 +331,7 @@ public class WifiGeoUtils{
                 Log.d("NOT ENABLED", String.valueOf(isWiFiEnabled));
             } else {
                 Log.d("ENABLED", String.valueOf(isWiFiEnabled));
-                context.registerReceiver(wifiReciever = new BroadcastReceiver() {
+                context.registerReceiver(wifiReceiver = new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
 
@@ -158,7 +352,7 @@ public class WifiGeoUtils{
     }
 
     public void unregisterReciever(){
-        context.unregisterReceiver(wifiReciever);
+        context.unregisterReceiver(wifiReceiver);
     }
 
     public List<ScanResult> getScanResults() {
@@ -185,6 +379,8 @@ public class WifiGeoUtils{
             locationManager.removeUpdates(listener);
         }
     }
+
+
     public Location getLocation(){
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return null;
@@ -330,5 +526,4 @@ public class WifiGeoUtils{
         isWiFiEnabled = false;
         return false;
     }
-
 }

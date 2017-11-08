@@ -6,7 +6,7 @@ import com.google.android.gms.location.Geofence;
  * Created by jtwyp6 on 11/4/17.
  */
 
-public class SMARTWifiGeoFence {
+public class SGeofence {
     private final String id;
     private final double latitude;
     private final double longitude;
@@ -15,8 +15,8 @@ public class SMARTWifiGeoFence {
     private int transitionType;
     private int loiteringDelay = 60000;
 
-    public SMARTWifiGeoFence(String geofenceId, double latitude, double longitude,
-                             float radius, long expiration, int transition) {
+    public SGeofence(String geofenceId, double latitude, double longitude,
+                     float radius, long expiration, int transition) {
         this.id = geofenceId;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -49,12 +49,14 @@ public class SMARTWifiGeoFence {
         return transitionType;
     }
 
-    public Geofence buildGeofence() {
-        Geofence builtGeofence = new Geofence.Builder().setRequestId(getId())
+    public com.google.android.gms.location.Geofence buildGeofence() {
+        com.google.android.gms.location.Geofence builtGeofence = new com.google.android.gms.location.Geofence.Builder().setRequestId(getId())
                 .setTransitionTypes(transitionType)
                 .setCircularRegion(getLatitude(), getLongitude(), getRadius())
                 .setExpirationDuration(expirationDuration)
                 .setLoiteringDelay(loiteringDelay).build();
         return builtGeofence;
     }
+
+
 }

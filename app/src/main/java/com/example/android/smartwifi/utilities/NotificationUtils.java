@@ -9,11 +9,13 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 
 import com.example.android.smartwifi.MainActivity;
 import com.example.android.smartwifi.R;
 import com.example.android.smartwifi.sync.SMARTWifiIntentService;
 import com.example.android.smartwifi.sync.SMARTWifiSyncTask;
+import com.google.android.gms.location.Geofence;
 
 /**
  * Created by jtwyp6 on 10/21/17.
@@ -21,6 +23,8 @@ import com.example.android.smartwifi.sync.SMARTWifiSyncTask;
 
 public class NotificationUtils {
     private static final int WIFI_THRESHOLD_NOTIFICATION_ID = 1138;
+    public static final int GEO_FENCE_NOTIFICATION_ID = 20;
+
     /**
      * This pending intent id is used to uniquely reference the pending intent
      */
@@ -36,6 +40,7 @@ public class NotificationUtils {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
     }
+
 
     public static void askUserToSwitchNonPriority(Context context){
 
@@ -77,6 +82,7 @@ public class NotificationUtils {
         // Pass in a unique ID of your choosing for the notification and notificationBuilder.build()
         notificationManager.notify(WIFI_THRESHOLD_NOTIFICATION_ID, notificationBuilder.build());
     }
+
 
     private static NotificationCompat.Action dismissPriorityWifiThresholdAction(Context context) {
         Intent dismissPriorityWifiThresholdIntent = new Intent(context, SMARTWifiIntentService.class);
@@ -122,4 +128,7 @@ public class NotificationUtils {
                 startActivityIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
+
+
+
 }

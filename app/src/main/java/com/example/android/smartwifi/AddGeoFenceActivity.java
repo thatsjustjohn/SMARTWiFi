@@ -11,14 +11,11 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.example.android.smartwifi.data.GeoFenceContract;
-import com.example.android.smartwifi.utilities.WifiGeoUtils;
+import com.example.android.smartwifi.data.geofencedb.GeofenceContract;
 
 public class AddGeoFenceActivity extends AppCompatActivity {
 
@@ -64,13 +61,13 @@ public class AddGeoFenceActivity extends AppCompatActivity {
         // Create new empty ContentValues object
         ContentValues contentValues = new ContentValues();
         // Put the Geo Fence Data into the ContentValues
-        contentValues.put(GeoFenceContract.TaskEntry.COLUMN_DESCRIPTION, geoFenceDescription);
-        contentValues.put(GeoFenceContract.TaskEntry.COLUMN_LATITUDE, geoFenceLatitude);
-        contentValues.put(GeoFenceContract.TaskEntry.COLUMN_LONGITUDE, geoFenceLongitude);
-        contentValues.put(GeoFenceContract.TaskEntry.COLUMN_RADIUS, geoFenceRadius);
+        contentValues.put(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION, geoFenceDescription);
+        contentValues.put(GeofenceContract.TaskEntry.COLUMN_LATITUDE, geoFenceLatitude);
+        contentValues.put(GeofenceContract.TaskEntry.COLUMN_LONGITUDE, geoFenceLongitude);
+        contentValues.put(GeofenceContract.TaskEntry.COLUMN_RADIUS, geoFenceRadius);
 
         // Insert the content values via a ContentResolver
-        Uri uri = getContentResolver().insert(GeoFenceContract.TaskEntry.CONTENT_URI, contentValues);
+        Uri uri = getContentResolver().insert(GeofenceContract.TaskEntry.CONTENT_URI, contentValues);
 
         // Display the URI that's returned with a Toast
         // [Hint] Don't forget to call finish() to return to MainActivity after this insert is complete

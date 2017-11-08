@@ -30,6 +30,10 @@ import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.example.android.smartwifi.data.geofencedb.GeofenceContentProvider;
+import com.example.android.smartwifi.data.geofencedb.GeofenceContract;
+import com.example.android.smartwifi.data.geofencedb.GeofenceDBHelper;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +45,7 @@ import static junit.framework.Assert.fail;
 @RunWith(AndroidJUnit4.class)
 
 
-public class TestGeoFenceContentProvider {
+public class TestSGeofenceContentProvider {
 
     /* Context used to access various parts of the system */
     private final Context mContext = InstrumentationRegistry.getTargetContext();
@@ -53,10 +57,10 @@ public class TestGeoFenceContentProvider {
      */
     @Before
     public void setUp() {
-        /* Use GeoFenceDBHelper to get access to a writable database */
-        GeoFenceDBHelper dbHelper = new GeoFenceDBHelper(mContext);
+        /* Use GeofenceDBHelper to get access to a writable database */
+        GeofenceDBHelper dbHelper = new GeofenceDBHelper(mContext);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
-        database.delete(GeoFenceContract.TaskEntry.TABLE_NAME, null, null);
+        database.delete(GeofenceContract.TaskEntry.TABLE_NAME, null, null);
     }
 
 
@@ -85,7 +89,7 @@ public class TestGeoFenceContentProvider {
          * registered.
          */
         String packageName = mContext.getPackageName();
-        String taskProviderClassName = GeoFenceContentProvider.class.getName();
+        String taskProviderClassName = GeofenceContentProvider.class.getName();
         ComponentName componentName = new ComponentName(packageName, taskProviderClassName);
 
         try {
@@ -128,7 +132,7 @@ public class TestGeoFenceContentProvider {
     //================================================================================
 
 
-    private static final Uri TEST_TASKS = GeoFenceContract.TaskEntry.CONTENT_URI;
+    private static final Uri TEST_TASKS = GeofenceContract.TaskEntry.CONTENT_URI;
     // Content URI for a single task with id = 1
     private static final Uri TEST_TASK_WITH_ID = TEST_TASKS.buildUpon().appendPath("1").build();
 
@@ -142,12 +146,12 @@ public class TestGeoFenceContentProvider {
     public void testUriMatcher() {
 
         /* Create a URI matcher that the TaskContentProvider uses */
-        UriMatcher testMatcher = GeoFenceContentProvider.buildUriMatcher();
+        UriMatcher testMatcher = GeofenceContentProvider.buildUriMatcher();
 
         /* Test that the code returned from our matcher matches the expected TASKS int */
         String tasksUriDoesNotMatch = "Error: The TASKS URI was matched incorrectly.";
         int actualTasksMatchCode = testMatcher.match(TEST_TASKS);
-        int expectedTasksMatchCode = GeoFenceContentProvider.TASKS;
+        int expectedTasksMatchCode = GeofenceContentProvider.TASKS;
         assertEquals(tasksUriDoesNotMatch,
                 actualTasksMatchCode,
                 expectedTasksMatchCode);
@@ -156,7 +160,7 @@ public class TestGeoFenceContentProvider {
         String taskWithIdDoesNotMatch =
                 "Error: The TASK_WITH_ID URI was matched incorrectly.";
         int actualTaskWithIdCode = testMatcher.match(TEST_TASK_WITH_ID);
-        int expectedTaskWithIdCode = GeoFenceContentProvider.TASK_WITH_ID;
+        int expectedTaskWithIdCode = GeofenceContentProvider.TASK_WITH_ID;
         assertEquals(taskWithIdDoesNotMatch,
                 actualTaskWithIdCode,
                 expectedTaskWithIdCode);
@@ -176,10 +180,10 @@ public class TestGeoFenceContentProvider {
 
         /* Create values to insert */
         ContentValues testTaskValues = new ContentValues();
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_DESCRIPTION, "Test description");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_LATITUDE, "39.0015329");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_LONGITUDE, "-77.0867936");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_RADIUS, "50");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION, "Test description");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_LATITUDE, "39.0015329");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_LONGITUDE, "-77.0867936");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_RADIUS, "50");
 
 
 
@@ -191,17 +195,17 @@ public class TestGeoFenceContentProvider {
         /* Register a content observer to be notified of changes to data at a given URI (tasks) */
         contentResolver.registerContentObserver(
                 /* URI that we would like to observe changes to */
-                GeoFenceContract.TaskEntry.CONTENT_URI,
+                GeofenceContract.TaskEntry.CONTENT_URI,
                 /* Whether or not to notify us if descendants of this URI change */
                 true,
                 /* The observer to register (that will receive notifyChange callbacks) */
                 taskObserver);
 
 
-        Uri uri = contentResolver.insert(GeoFenceContract.TaskEntry.CONTENT_URI, testTaskValues);
+        Uri uri = contentResolver.insert(GeofenceContract.TaskEntry.CONTENT_URI, testTaskValues);
 
 
-        Uri expectedUri = ContentUris.withAppendedId(GeoFenceContract.TaskEntry.CONTENT_URI, 1);
+        Uri expectedUri = ContentUris.withAppendedId(GeofenceContract.TaskEntry.CONTENT_URI, 1);
 
         String insertProviderFailed = "Unable to insert item through Provider";
         assertEquals(insertProviderFailed, uri, expectedUri);
@@ -232,20 +236,20 @@ public class TestGeoFenceContentProvider {
     public void testQuery() {
 
         /* Get access to a writable database */
-        GeoFenceDBHelper dbHelper = new GeoFenceDBHelper(mContext);
+        GeofenceDBHelper dbHelper = new GeofenceDBHelper(mContext);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
         /* Create values to insert */
         ContentValues testTaskValues = new ContentValues();
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_DESCRIPTION, "Test description");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_LATITUDE, "39.0015329");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_LONGITUDE, "-77.0867936");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_RADIUS, "50");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION, "Test description");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_LATITUDE, "39.0015329");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_LONGITUDE, "-77.0867936");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_RADIUS, "50");
 
         /* Insert ContentValues into database and get a row ID back */
         long taskRowId = database.insert(
                 /* Table to insert values into */
-                GeoFenceContract.TaskEntry.TABLE_NAME,
+                GeofenceContract.TaskEntry.TABLE_NAME,
                 null,
                 /* Values to insert into table */
                 testTaskValues);
@@ -258,7 +262,7 @@ public class TestGeoFenceContentProvider {
 
         /* Perform the ContentProvider query */
         Cursor taskCursor = mContext.getContentResolver().query(
-                GeoFenceContract.TaskEntry.CONTENT_URI,
+                GeofenceContract.TaskEntry.CONTENT_URI,
                 /* Columns; leaving this null returns every column in the table */
                 null,
                 /* Optional specification for columns in the "where" clause above */
@@ -288,20 +292,20 @@ public class TestGeoFenceContentProvider {
     @Test
     public void testDelete() {
         /* Access writable database */
-        GeoFenceDBHelper helper = new GeoFenceDBHelper(InstrumentationRegistry.getTargetContext());
+        GeofenceDBHelper helper = new GeofenceDBHelper(InstrumentationRegistry.getTargetContext());
         SQLiteDatabase database = helper.getWritableDatabase();
 
         /* Create a new row of task data */
         ContentValues testTaskValues = new ContentValues();
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_DESCRIPTION, "Test description");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_LATITUDE, "39.0015329");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_LONGITUDE, "-77.0867936");
-        testTaskValues.put(GeoFenceContract.TaskEntry.COLUMN_RADIUS, "50");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION, "Test description");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_LATITUDE, "39.0015329");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_LONGITUDE, "-77.0867936");
+        testTaskValues.put(GeofenceContract.TaskEntry.COLUMN_RADIUS, "50");
 
         /* Insert ContentValues into database and get a row ID back */
         long taskRowId = database.insert(
                 /* Table to insert values into */
-                GeoFenceContract.TaskEntry.TABLE_NAME,
+                GeofenceContract.TaskEntry.TABLE_NAME,
                 null,
                 /* Values to insert into table */
                 testTaskValues);
@@ -321,7 +325,7 @@ public class TestGeoFenceContentProvider {
         /* Register a content observer to be notified of changes to data at a given URI (tasks) */
         contentResolver.registerContentObserver(
                 /* URI that we would like to observe changes to */
-                GeoFenceContract.TaskEntry.CONTENT_URI,
+                GeofenceContract.TaskEntry.CONTENT_URI,
                 /* Whether or not to notify us if descendants of this URI change */
                 true,
                 /* The observer to register (that will receive notifyChange callbacks) */
@@ -330,7 +334,7 @@ public class TestGeoFenceContentProvider {
 
 
         /* The delete method deletes the previously inserted row with id = 1 */
-        Uri uriToDelete = GeoFenceContract.TaskEntry.CONTENT_URI.buildUpon().appendPath("1").build();
+        Uri uriToDelete = GeofenceContract.TaskEntry.CONTENT_URI.buildUpon().appendPath("1").build();
         int tasksDeleted = contentResolver.delete(uriToDelete, null, null);
 
         String deleteFailed = "Unable to delete item in the database";

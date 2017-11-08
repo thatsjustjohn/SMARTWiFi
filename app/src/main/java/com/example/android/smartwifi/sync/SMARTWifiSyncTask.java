@@ -1,19 +1,11 @@
 package com.example.android.smartwifi.sync;
 
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
-import android.os.Handler;
-import android.support.design.widget.Snackbar;
-import android.support.v7.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
 
-import com.example.android.smartwifi.MainActivity;
-import com.example.android.smartwifi.R;
 import com.example.android.smartwifi.data.SMARTWifiPreferences;
+import com.example.android.smartwifi.utilities.GeofenceUtils;
 import com.example.android.smartwifi.utilities.NotificationUtils;
 import com.example.android.smartwifi.utilities.WifiGeoUtils;
 
@@ -28,6 +20,9 @@ public class SMARTWifiSyncTask{
     public static final String ACTION_WIFI_ON = "wifi-on";
     public static WifiGeoUtils wifiGeoUtils;
     public static boolean pref_threshold;
+    public static boolean pref_geolocation;
+    public static boolean pref_datalogging;
+    public static boolean pref_priority;
 
 
     public static void executeTask(Context context, String action) {
@@ -48,41 +43,62 @@ public class SMARTWifiSyncTask{
 
         //Monitoring
 
+        //TEST DB ACCESS
+        Log.d("DB ACCESS", "BALLS");
+        GeofenceUtils.getInstance().loadGeoFencesFromDB(context);
+        GeofenceUtils.getInstance().getGeofences();
+
+
         //SETUP PREFERENCES
         pref_threshold = SMARTWifiPreferences.isThresholdEnabled(context);
+        pref_geolocation = SMARTWifiPreferences.isGeoFenceEnabled(context);
+        pref_datalogging = SMARTWifiPreferences.isDataLoggingEnabled(context);
+        pref_priority = SMARTWifiPreferences.isPriorityEnabled(context);
 
-        //CREATE GEOUTILS
-        wifiGeoUtils = new WifiGeoUtils(context);
-        Log.d("Threshold Enabled", String.valueOf(pref_threshold));
+        if(pref_priority || pref_datalogging || pref_geolocation || pref_threshold) {
 
-        //if wifi is on, start location tracking
-        //if data logging is on
-        if(wifiGeoUtils.wifiManager.isWifiEnabled())
-            wifiGeoUtils.startLocationTracking();
+                //CREATE WIFI GEO UTILS
+                 wifiGeoUtils = new WifiGeoUtils(context);
 
-        while(wifiGeoUtils.wifiManager.isWifiEnabled()){
-            Log.d("MAIN TASK", "While Enabled");
-            WifiInfo wifiInfo = wifiGeoUtils.getConnectionInfo();
-            Log.d("MAIN TASK", wifiInfo.toString());
-            wifiGeoUtils.getLocation();
-            if(pref_threshold){
-                wifiGeoUtils.thresholdMonitor();
-                Log.d("Threshold Enabled", "While Enabled");
+                //if wifi is on, start location tracking
+                //if data logging is on
 
+            //if (wifiGeoUtils.wifiManager.isWifiEnabled())
+            //        wifiGeoUtils.startLocationTracking();
 
+            // START GEO FENCING
+            if (pref_geolocation) {
+                    wifiGeoUtils.geoOnStart();
+                    Log.d("GEO ENABLED", String.valueOf(pref_geolocation));
+                    if(!wifiGeoUtils.registeredGeo) wifiGeoUtils.registerGeofences();
             }
-            Thread.sleep(1000);
+
+            while (wifiGeoUtils.wifiManager.isWifiEnabled()) {
+                //register/update geo fences if they aren't registered.
+                if(!wifiGeoUtils.registeredGeo){
+                    Log.d("MAIN TASK", "Trying to register second");
+                    wifiGeoUtils.registerGeofences();
+                }
+                //WifiInfo wifiInfo = wifiGeoUtils.getConnectionInfo();
+                //Log.d("MAIN TASK", wifiInfo.toString());
+
+                //wifiGeoUtils.getLocation();
+
+                if (pref_threshold) {
+                    wifiGeoUtils.thresholdMonitor();
+                }
+                Thread.sleep(1000);
+            }
+
+            //after wifi is disabled stop tracking
+            //wifiGeoUtils.stopLocationTracking();
+            wifiGeoUtils.geoOnStop();
+            //while wifi is enable run code here.
         }
-        //after wifi is disabled stop tracking
-        wifiGeoUtils.stopLocationTracking();
-        //while wifi is enable run code here.
     }
 
 
-
-
     private static void handleWifiThreshold(Context context) {
-        //PreferenceUtilities.incrementWaterCount(context);
         Log.d("LETS GET TO WORK DAWG", "we doing background shit meow");
         NotificationUtils.clearAllNotifications(context);
     }

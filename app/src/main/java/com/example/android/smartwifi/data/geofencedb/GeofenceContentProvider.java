@@ -1,4 +1,4 @@
-package com.example.android.smartwifi.data;
+package com.example.android.smartwifi.data.geofencedb;
 
 
 
@@ -12,13 +12,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import static com.example.android.smartwifi.data.GeoFenceContract.TaskEntry.TABLE_NAME;
+import static com.example.android.smartwifi.data.geofencedb.GeofenceContract.TaskEntry.TABLE_NAME;
 
 /**
  * Created by jtwyp6 on 10/29/17.
  */
 
-public class GeoFenceContentProvider extends ContentProvider {
+public class GeofenceContentProvider extends ContentProvider {
 
     // Define final integer constants for the directory of tasks and a single item.
     // It's convention to use 100, 200, 300, etc for directories,
@@ -44,14 +44,14 @@ public class GeoFenceContentProvider extends ContentProvider {
           For each kind of uri you may want to access, add the corresponding match with addURI.
           The two calls below add matches for the task directory and a single item by ID.
          */
-        uriMatcher.addURI(GeoFenceContract.AUTHORITY, GeoFenceContract.PATH_TASKS, TASKS);
-        uriMatcher.addURI(GeoFenceContract.AUTHORITY, GeoFenceContract.PATH_TASKS + "/#", TASK_WITH_ID);
+        uriMatcher.addURI(GeofenceContract.AUTHORITY, GeofenceContract.PATH_TASKS, TASKS);
+        uriMatcher.addURI(GeofenceContract.AUTHORITY, GeofenceContract.PATH_TASKS + "/#", TASK_WITH_ID);
 
         return uriMatcher;
     }
 
     // Member variable for a TaskDbHelper that's initialized in the onCreate() method
-    private GeoFenceDBHelper mGeoFenceDBHelper;
+    private GeofenceDBHelper mGeofenceDBHelper;
 
     /* onCreate() is where you should initialize anything you’ll need to setup
     your underlying data source.
@@ -64,7 +64,7 @@ public class GeoFenceContentProvider extends ContentProvider {
         // [Hint] Declare the DbHelper as a global variable
 
         Context context = getContext();
-        mGeoFenceDBHelper = new GeoFenceDBHelper(context);
+        mGeofenceDBHelper = new GeofenceDBHelper(context);
         return true;
     }
 
@@ -73,7 +73,7 @@ public class GeoFenceContentProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
         // Get access to the task database (to write new data to)
-        final SQLiteDatabase db = mGeoFenceDBHelper.getWritableDatabase();
+        final SQLiteDatabase db = mGeofenceDBHelper.getWritableDatabase();
 
         // Write URI matching code to identify the match for the tasks directory
         int match = sUriMatcher.match(uri);
@@ -85,7 +85,7 @@ public class GeoFenceContentProvider extends ContentProvider {
                 // Inserting values into tasks table
                 long id = db.insert(TABLE_NAME, null, values);
                 if ( id > 0 ) {
-                    returnUri = ContentUris.withAppendedId(GeoFenceContract.TaskEntry.CONTENT_URI, id);
+                    returnUri = ContentUris.withAppendedId(GeofenceContract.TaskEntry.CONTENT_URI, id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -110,7 +110,7 @@ public class GeoFenceContentProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
 
         // Get access to underlying database (read-only for query)
-        final SQLiteDatabase db = mGeoFenceDBHelper.getReadableDatabase();
+        final SQLiteDatabase db = mGeofenceDBHelper.getReadableDatabase();
 
         // Write URI match code and set a variable to return a Cursor
         int match = sUriMatcher.match(uri);
@@ -146,7 +146,7 @@ public class GeoFenceContentProvider extends ContentProvider {
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
         // Get access to the database and write URI matching code to recognize a single item
-        final SQLiteDatabase db = mGeoFenceDBHelper.getWritableDatabase();
+        final SQLiteDatabase db = mGeofenceDBHelper.getWritableDatabase();
 
         int match = sUriMatcher.match(uri);
         // Keep track of the number of deleted tasks

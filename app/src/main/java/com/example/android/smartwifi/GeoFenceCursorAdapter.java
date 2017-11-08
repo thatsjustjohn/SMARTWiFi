@@ -2,15 +2,13 @@ package com.example.android.smartwifi;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.GradientDrawable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.android.smartwifi.data.GeoFenceContract;
+import com.example.android.smartwifi.data.geofencedb.GeofenceContract;
 
 
 /**
@@ -60,11 +58,11 @@ public class GeoFenceCursorAdapter extends RecyclerView.Adapter<GeoFenceCursorAd
     public void onBindViewHolder(TaskViewHolder holder, int position) {
 
         // Indices for the _id, description, and priority columns
-        int idIndex = mCursor.getColumnIndex(GeoFenceContract.TaskEntry._ID);
-        int descriptionIndex = mCursor.getColumnIndex(GeoFenceContract.TaskEntry.COLUMN_DESCRIPTION);
-        int latitidueIndex = mCursor.getColumnIndex(GeoFenceContract.TaskEntry.COLUMN_LATITUDE);
-        int longitudeIndex = mCursor.getColumnIndex(GeoFenceContract.TaskEntry.COLUMN_LONGITUDE);
-        int radiusIndex = mCursor.getColumnIndex(GeoFenceContract.TaskEntry.COLUMN_RADIUS);
+        int idIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry._ID);
+        int descriptionIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION);
+        int latitidueIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_LATITUDE);
+        int longitudeIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_LONGITUDE);
+        int radiusIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_RADIUS);
 
         mCursor.moveToPosition(position); // get to the right location in the cursor
 
