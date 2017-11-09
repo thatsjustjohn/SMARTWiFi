@@ -1,4 +1,4 @@
-package com.example.android.smartwifi.data.geofencedb;
+package com.example.android.smartwifi.data.prioritydb;
 
 
 
@@ -12,22 +12,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import com.example.android.smartwifi.data.geofencedb.GeofenceContract;
-import com.example.android.smartwifi.data.geofencedb.GeofenceDBHelper;
-
-import static com.example.android.smartwifi.data.geofencedb.GeofenceContract.GeofenceEntry.TABLE_NAME;
+import static com.example.android.smartwifi.data.prioritydb.PriorityContract.PriorityEntry.TABLE_NAME;
 
 /**
  * Created by jtwyp6 on 10/29/17.
  */
 
-public class GeofenceContentProvider extends ContentProvider {
+public class PriorityContentProvider extends ContentProvider {
 
-    // Define final integer constants for the directory of GEOFENCE and a single item.
+    // Define final integer constants for the directory of tasks and a single item.
     // It's convention to use 100, 200, 300, etc for directories,
     // and related ints (101, 102, ..) for items in that directory.
-    public static final int GEOFENCE = 100;
-    public static final int GEOFENCE_WITH_ID = 101;
+    public static final int PRIORITYS = 200;
+    public static final int PRIORITYS_WITH_ID = 201;
 
     // CDeclare a static variable for the Uri matcher that you construct
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -47,14 +44,14 @@ public class GeofenceContentProvider extends ContentProvider {
           For each kind of uri you may want to access, add the corresponding match with addURI.
           The two calls below add matches for the task directory and a single item by ID.
          */
-        uriMatcher.addURI(GeofenceContract.AUTHORITY, GeofenceContract.PATH_GEOFENCES, GEOFENCE);
-        uriMatcher.addURI(GeofenceContract.AUTHORITY, GeofenceContract.PATH_GEOFENCES + "/#", GEOFENCE_WITH_ID);
+        uriMatcher.addURI(PriorityContract.AUTHORITY, PriorityContract.PATH_PRIORITY, PRIORITYS);
+        uriMatcher.addURI(PriorityContract.AUTHORITY, PriorityContract.PATH_PRIORITY + "/#", PRIORITYS_WITH_ID);
 
         return uriMatcher;
     }
 
     // Member variable for a TaskDbHelper that's initialized in the onCreate() method
-    private GeofenceDBHelper mGeofenceDBHelper;
+    private PriorityDBHelper mPriorityDBHelper;
 
     /* onCreate() is where you should initialize anything you’ll need to setup
     your underlying data source.
@@ -67,7 +64,7 @@ public class GeofenceContentProvider extends ContentProvider {
         // [Hint] Declare the DbHelper as a global variable
 
         Context context = getContext();
-        mGeofenceDBHelper = new GeofenceDBHelper(context);
+        mPriorityDBHelper = new PriorityDBHelper(context);
         return true;
     }
 
@@ -76,19 +73,19 @@ public class GeofenceContentProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
         // Get access to the task database (to write new data to)
-        final SQLiteDatabase db = mGeofenceDBHelper.getWritableDatabase();
+        final SQLiteDatabase db = mPriorityDBHelper.getWritableDatabase();
 
-        // Write URI matching code to identify the match for the GEOFENCE directory
+        // Write URI matching code to identify the match for the tasks directory
         int match = sUriMatcher.match(uri);
         Uri returnUri; // URI to be returned
 
         switch (match) {
-            case GEOFENCE:
+            case PRIORITYS:
                 // Insert new values into the database
-                // Inserting values into GEOFENCE table
+                // Inserting values into tasks table
                 long id = db.insert(TABLE_NAME, null, values);
                 if ( id > 0 ) {
-                    returnUri = ContentUris.withAppendedId(GeofenceContract.GeofenceEntry.CONTENT_URI, id);
+                    returnUri = ContentUris.withAppendedId(PriorityContract.PriorityEntry.CONTENT_URI, id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 }
@@ -113,16 +110,16 @@ public class GeofenceContentProvider extends ContentProvider {
                         String[] selectionArgs, String sortOrder) {
 
         // Get access to underlying database (read-only for query)
-        final SQLiteDatabase db = mGeofenceDBHelper.getReadableDatabase();
+        final SQLiteDatabase db = mPriorityDBHelper.getReadableDatabase();
 
         // Write URI match code and set a variable to return a Cursor
         int match = sUriMatcher.match(uri);
         Cursor retCursor;
 
-        // Query for the GEOFENCE directory and write a default case
+        // Query for the tasks directory and write a default case
         switch (match) {
-            // Query for the GEOFENCE directory
-            case GEOFENCE:
+            // Query for the tasks directory
+            case PRIORITYS:
                 retCursor =  db.query(TABLE_NAME,
                         projection,
                         selection,
@@ -149,34 +146,34 @@ public class GeofenceContentProvider extends ContentProvider {
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
         // Get access to the database and write URI matching code to recognize a single item
-        final SQLiteDatabase db = mGeofenceDBHelper.getWritableDatabase();
+        final SQLiteDatabase db = mPriorityDBHelper.getWritableDatabase();
 
         int match = sUriMatcher.match(uri);
-        // Keep track of the number of deleted GEOFENCE
-        int GEOFENCEDeleted; // starts as 0
+        // Keep track of the number of deleted tasks
+        int tasksDeleted; // starts as 0
 
         // Write the code to delete a single row of data
         // [Hint] Use selections to delete an item by its row ID
         switch (match) {
             // Handle the single item case, recognized by the ID included in the URI path
-            case GEOFENCE_WITH_ID:
+            case PRIORITYS_WITH_ID:
                 // Get the task ID from the URI path
                 String id = uri.getPathSegments().get(1);
                 // Use selections/selectionArgs to filter for this ID
-                GEOFENCEDeleted = db.delete(TABLE_NAME, "_id=?", new String[]{id});
+                tasksDeleted = db.delete(TABLE_NAME, "_id=?", new String[]{id});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
         // Notify the resolver of a change and return the number of items deleted
-        if (GEOFENCEDeleted != 0) {
+        if (tasksDeleted != 0) {
             // A task was deleted, set notification
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
-        // Return the number of GEOFENCE deleted
-        return GEOFENCEDeleted;
+        // Return the number of tasks deleted
+        return tasksDeleted;
     }
 
 

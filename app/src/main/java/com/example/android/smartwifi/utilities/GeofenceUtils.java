@@ -43,18 +43,18 @@ public class GeofenceUtils {
 
 
         //get cursor via query
-        mCursor = mContext.getContentResolver().query(GeofenceContract.TaskEntry.CONTENT_URI,
+        mCursor = mContext.getContentResolver().query(GeofenceContract.GeofenceEntry.CONTENT_URI,
                 null,
                 null,
                 null,
                 null);
 
         //set indexs
-        int idIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry._ID);
-        int descriptionIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION);
-        int latitidueIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_LATITUDE);
-        int longitudeIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_LONGITUDE);
-        int radiusIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_RADIUS);
+        int idIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry._ID);
+        int descriptionIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_DESCRIPTION);
+        int latitidueIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_LATITUDE);
+        int longitudeIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_LONGITUDE);
+        int radiusIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_RADIUS);
 
         //move to first item in DB
         mCursor.moveToFirst();

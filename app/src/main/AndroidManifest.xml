@@ -55,10 +55,19 @@
 
         <service android:name=".sync.GeofenceTransitionIntentService" />
 
+
+        <provider
+            android:name=".data.prioritydb.PriorityContentProvider"
+            android:authorities="com.example.android.smartwifi.priority"
+            android:exported="false" />
         <provider
             android:name=".data.geofencedb.GeofenceContentProvider"
-            android:authorities="com.example.android.smartwifi"
+            android:authorities="com.example.android.smartwifi.geofence"
             android:exported="false" />
+
+
+
+
 
         <activity android:name=".AddGeoFenceActivity" />
         <!--

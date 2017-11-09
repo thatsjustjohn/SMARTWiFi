@@ -82,7 +82,7 @@ public class GeoFenceActivity extends AppCompatActivity implements
 
                 // Build appropriate uri with String row id appended
                 String stringId = Integer.toString(id);
-                Uri uri = GeofenceContract.TaskEntry.CONTENT_URI;
+                Uri uri = GeofenceContract.GeofenceEntry.CONTENT_URI;
                 uri = uri.buildUpon().appendPath(stringId).build();
 
                 // COMPLETED (2) Delete a single row of data using a ContentResolver
@@ -174,11 +174,11 @@ public class GeoFenceActivity extends AppCompatActivity implements
                 // [Hint] use a try/catch block to catch any errors in loading data
 
                 try {
-                    return getContentResolver().query(GeofenceContract.TaskEntry.CONTENT_URI,
+                    return getContentResolver().query(GeofenceContract.GeofenceEntry.CONTENT_URI,
                             null,
                             null,
                             null,
-                            GeofenceContract.TaskEntry.COLUMN_RADIUS);
+                            GeofenceContract.GeofenceEntry.COLUMN_RADIUS);
 
                 } catch (Exception e) {
                     Log.e(TAG, "Failed to asynchronously load data.");

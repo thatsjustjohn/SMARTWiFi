@@ -61,13 +61,13 @@ public class AddGeoFenceActivity extends AppCompatActivity {
         // Create new empty ContentValues object
         ContentValues contentValues = new ContentValues();
         // Put the Geo Fence Data into the ContentValues
-        contentValues.put(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION, geoFenceDescription);
-        contentValues.put(GeofenceContract.TaskEntry.COLUMN_LATITUDE, geoFenceLatitude);
-        contentValues.put(GeofenceContract.TaskEntry.COLUMN_LONGITUDE, geoFenceLongitude);
-        contentValues.put(GeofenceContract.TaskEntry.COLUMN_RADIUS, geoFenceRadius);
+        contentValues.put(GeofenceContract.GeofenceEntry.COLUMN_DESCRIPTION, geoFenceDescription);
+        contentValues.put(GeofenceContract.GeofenceEntry.COLUMN_LATITUDE, geoFenceLatitude);
+        contentValues.put(GeofenceContract.GeofenceEntry.COLUMN_LONGITUDE, geoFenceLongitude);
+        contentValues.put(GeofenceContract.GeofenceEntry.COLUMN_RADIUS, geoFenceRadius);
 
         // Insert the content values via a ContentResolver
-        Uri uri = getContentResolver().insert(GeofenceContract.TaskEntry.CONTENT_URI, contentValues);
+        Uri uri = getContentResolver().insert(GeofenceContract.GeofenceEntry.CONTENT_URI, contentValues);
 
         // Display the URI that's returned with a Toast
         // [Hint] Don't forget to call finish() to return to MainActivity after this insert is complete

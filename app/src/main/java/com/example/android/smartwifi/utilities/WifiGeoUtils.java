@@ -352,7 +352,10 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void unregisterReciever(){
-        context.unregisterReceiver(wifiReceiver);
+        if(wifiReceiver != null)
+        {
+            context.unregisterReceiver(wifiReceiver);
+        }
     }
 
     public List<ScanResult> getScanResults() {

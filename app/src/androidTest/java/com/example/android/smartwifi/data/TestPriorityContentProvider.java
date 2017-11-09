@@ -30,9 +30,9 @@ import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.example.android.smartwifi.data.geofencedb.GeofenceContract;
-import com.example.android.smartwifi.data.geofencedb.GeofenceDBHelper;
-import com.example.android.smartwifi.data.geofencedb.GeofenceContentProvider;
+import com.example.android.smartwifi.data.prioritydb.PriorityContentProvider;
+import com.example.android.smartwifi.data.prioritydb.PriorityContract;
+import com.example.android.smartwifi.data.prioritydb.PriorityDBHelper;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ import static junit.framework.Assert.fail;
 @RunWith(AndroidJUnit4.class)
 
 
-public class TestSGeofenceContentProvider {
+public class TestPriorityContentProvider {
 
     /* Context used to access various parts of the system */
     private final Context mContext = InstrumentationRegistry.getTargetContext();
@@ -58,9 +58,9 @@ public class TestSGeofenceContentProvider {
     @Before
     public void setUp() {
         /* Use PriorityDBHelper to get access to a writable database */
-        GeofenceDBHelper dbHelper = new GeofenceDBHelper(mContext);
+        PriorityDBHelper dbHelper = new PriorityDBHelper(mContext);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
-        database.delete(GeofenceContract.GeofenceEntry.TABLE_NAME, null, null);
+        database.delete(PriorityContract.PriorityEntry.TABLE_NAME, null, null);
     }
 
 
@@ -89,7 +89,7 @@ public class TestSGeofenceContentProvider {
          * registered.
          */
         String packageName = mContext.getPackageName();
-        String taskProviderClassName = GeofenceContentProvider.class.getName();
+        String taskProviderClassName = PriorityContentProvider.class.getName();
         ComponentName componentName = new ComponentName(packageName, taskProviderClassName);
 
         try {
@@ -104,7 +104,7 @@ public class TestSGeofenceContentProvider {
             /* The ProviderInfo will contain the authority, which is what we want to test */
             ProviderInfo providerInfo = pm.getProviderInfo(componentName, 0);
             String actualAuthority = providerInfo.authority;
-            String expectedAuthority = packageName + ".geofence";
+            String expectedAuthority = packageName + ".priority";
 
             /* Make sure that the registered authority matches the authority from the Contract */
             String incorrectAuthority =
@@ -132,9 +132,9 @@ public class TestSGeofenceContentProvider {
     //================================================================================
 
 
-    private static final Uri TEST_GEOFENCE = GeofenceContract.GeofenceEntry.CONTENT_URI;
+    private static final Uri TEST_TASKS = PriorityContract.PriorityEntry.CONTENT_URI;
     // Content URI for a single task with id = 1
-    private static final Uri TEST_GEOFENCE_WITH_ID = TEST_GEOFENCE.buildUpon().appendPath("1").build();
+    private static final Uri TEST_TASK_WITH_ID = TEST_TASKS.buildUpon().appendPath("1").build();
 
 
     /**
@@ -146,12 +146,12 @@ public class TestSGeofenceContentProvider {
     public void testUriMatcher() {
 
         /* Create a URI matcher that the TaskContentProvider uses */
-        UriMatcher testMatcher = GeofenceContentProvider.buildUriMatcher();
+        UriMatcher testMatcher = PriorityContentProvider.buildUriMatcher();
 
         /* Test that the code returned from our matcher matches the expected TASKS int */
         String tasksUriDoesNotMatch = "Error: The TASKS URI was matched incorrectly.";
-        int actualTasksMatchCode = testMatcher.match(TEST_GEOFENCE);
-        int expectedTasksMatchCode = GeofenceContentProvider.GEOFENCE;
+        int actualTasksMatchCode = testMatcher.match(TEST_TASKS);
+        int expectedTasksMatchCode = PriorityContentProvider.PRIORITYS;
         assertEquals(tasksUriDoesNotMatch,
                 actualTasksMatchCode,
                 expectedTasksMatchCode);
@@ -159,8 +159,8 @@ public class TestSGeofenceContentProvider {
         /* Test that the code returned from our matcher matches the expected TASK_WITH_ID */
         String taskWithIdDoesNotMatch =
                 "Error: The TASK_WITH_ID URI was matched incorrectly.";
-        int actualTaskWithIdCode = testMatcher.match(TEST_GEOFENCE_WITH_ID);
-        int expectedTaskWithIdCode = GeofenceContentProvider.GEOFENCE_WITH_ID;
+        int actualTaskWithIdCode = testMatcher.match(TEST_TASK_WITH_ID);
+        int expectedTaskWithIdCode = PriorityContentProvider.PRIORITYS_WITH_ID;
         assertEquals(taskWithIdDoesNotMatch,
                 actualTaskWithIdCode,
                 expectedTaskWithIdCode);
@@ -179,12 +179,9 @@ public class TestSGeofenceContentProvider {
     public void testInsert() {
 
         /* Create values to insert */
-        ContentValues testTaskValues = new ContentValues();
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_DESCRIPTION, "Test description");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_LATITUDE, "39.0015329");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_LONGITUDE, "-77.0867936");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_RADIUS, "50");
-
+        ContentValues testPriorityValues = new ContentValues();
+        testPriorityValues.put(PriorityContract.PriorityEntry.COLUMN_ACCESSPOINT, "TEST AP");
+        testPriorityValues.put(PriorityContract.PriorityEntry.COLUMN_PRIORITY, "4");
 
 
         /* TestContentObserver allows us to test if notifyChange was called appropriately */
@@ -195,17 +192,17 @@ public class TestSGeofenceContentProvider {
         /* Register a content observer to be notified of changes to data at a given URI (tasks) */
         contentResolver.registerContentObserver(
                 /* URI that we would like to observe changes to */
-                GeofenceContract.GeofenceEntry.CONTENT_URI,
+                PriorityContract.PriorityEntry.CONTENT_URI,
                 /* Whether or not to notify us if descendants of this URI change */
                 true,
                 /* The observer to register (that will receive notifyChange callbacks) */
                 taskObserver);
 
 
-        Uri uri = contentResolver.insert(GeofenceContract.GeofenceEntry.CONTENT_URI, testTaskValues);
+        Uri uri = contentResolver.insert(PriorityContract.PriorityEntry.CONTENT_URI, testPriorityValues);
 
 
-        Uri expectedUri = ContentUris.withAppendedId(GeofenceContract.GeofenceEntry.CONTENT_URI, 1);
+        Uri expectedUri = ContentUris.withAppendedId(PriorityContract.PriorityEntry.CONTENT_URI, 1);
 
         String insertProviderFailed = "Unable to insert item through Provider";
         assertEquals(insertProviderFailed, uri, expectedUri);
@@ -236,23 +233,21 @@ public class TestSGeofenceContentProvider {
     public void testQuery() {
 
         /* Get access to a writable database */
-        GeofenceDBHelper dbHelper = new GeofenceDBHelper(mContext);
+        PriorityDBHelper dbHelper = new PriorityDBHelper(mContext);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
 
         /* Create values to insert */
-        ContentValues testTaskValues = new ContentValues();
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_DESCRIPTION, "Test description");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_LATITUDE, "39.0015329");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_LONGITUDE, "-77.0867936");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_RADIUS, "50");
+        ContentValues testPriorityValues = new ContentValues();
+        testPriorityValues.put(PriorityContract.PriorityEntry.COLUMN_ACCESSPOINT, "TEST AP");
+        testPriorityValues.put(PriorityContract.PriorityEntry.COLUMN_PRIORITY, "4");
 
         /* Insert ContentValues into database and get a row ID back */
         long taskRowId = database.insert(
                 /* Table to insert values into */
-                GeofenceContract.GeofenceEntry.TABLE_NAME,
+                PriorityContract.PriorityEntry.TABLE_NAME,
                 null,
                 /* Values to insert into table */
-                testTaskValues);
+                testPriorityValues);
 
         String insertFailed = "Unable to insert directly into the database";
         assertTrue(insertFailed, taskRowId != -1);
@@ -262,7 +257,7 @@ public class TestSGeofenceContentProvider {
 
         /* Perform the ContentProvider query */
         Cursor taskCursor = mContext.getContentResolver().query(
-                GeofenceContract.GeofenceEntry.CONTENT_URI,
+                PriorityContract.PriorityEntry.CONTENT_URI,
                 /* Columns; leaving this null returns every column in the table */
                 null,
                 /* Optional specification for columns in the "where" clause above */
@@ -292,23 +287,21 @@ public class TestSGeofenceContentProvider {
     @Test
     public void testDelete() {
         /* Access writable database */
-        GeofenceDBHelper helper = new GeofenceDBHelper(InstrumentationRegistry.getTargetContext());
+        PriorityDBHelper helper = new PriorityDBHelper(InstrumentationRegistry.getTargetContext());
         SQLiteDatabase database = helper.getWritableDatabase();
 
         /* Create a new row of task data */
-        ContentValues testTaskValues = new ContentValues();
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_DESCRIPTION, "Test description");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_LATITUDE, "39.0015329");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_LONGITUDE, "-77.0867936");
-        testTaskValues.put(GeofenceContract.GeofenceEntry.COLUMN_RADIUS, "50");
+        ContentValues testPriorityValues = new ContentValues();
+        testPriorityValues.put(PriorityContract.PriorityEntry.COLUMN_ACCESSPOINT, "TEST AP");
+        testPriorityValues.put(PriorityContract.PriorityEntry.COLUMN_PRIORITY, "4");
 
         /* Insert ContentValues into database and get a row ID back */
         long taskRowId = database.insert(
                 /* Table to insert values into */
-                GeofenceContract.GeofenceEntry.TABLE_NAME,
+                PriorityContract.PriorityEntry.TABLE_NAME,
                 null,
                 /* Values to insert into table */
-                testTaskValues);
+                testPriorityValues);
 
         /* Always close the database when you're through with it */
         database.close();
@@ -325,7 +318,7 @@ public class TestSGeofenceContentProvider {
         /* Register a content observer to be notified of changes to data at a given URI (tasks) */
         contentResolver.registerContentObserver(
                 /* URI that we would like to observe changes to */
-                GeofenceContract.GeofenceEntry.CONTENT_URI,
+                PriorityContract.PriorityEntry.CONTENT_URI,
                 /* Whether or not to notify us if descendants of this URI change */
                 true,
                 /* The observer to register (that will receive notifyChange callbacks) */
@@ -334,7 +327,7 @@ public class TestSGeofenceContentProvider {
 
 
         /* The delete method deletes the previously inserted row with id = 1 */
-        Uri uriToDelete = GeofenceContract.GeofenceEntry.CONTENT_URI.buildUpon().appendPath("1").build();
+        Uri uriToDelete = PriorityContract.PriorityEntry.CONTENT_URI.buildUpon().appendPath("1").build();
         int tasksDeleted = contentResolver.delete(uriToDelete, null, null);
 
         String deleteFailed = "Unable to delete item in the database";

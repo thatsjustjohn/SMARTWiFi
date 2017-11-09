@@ -58,11 +58,11 @@ public class GeoFenceCursorAdapter extends RecyclerView.Adapter<GeoFenceCursorAd
     public void onBindViewHolder(TaskViewHolder holder, int position) {
 
         // Indices for the _id, description, and priority columns
-        int idIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry._ID);
-        int descriptionIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_DESCRIPTION);
-        int latitidueIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_LATITUDE);
-        int longitudeIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_LONGITUDE);
-        int radiusIndex = mCursor.getColumnIndex(GeofenceContract.TaskEntry.COLUMN_RADIUS);
+        int idIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry._ID);
+        int descriptionIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_DESCRIPTION);
+        int latitidueIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_LATITUDE);
+        int longitudeIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_LONGITUDE);
+        int radiusIndex = mCursor.getColumnIndex(GeofenceContract.GeofenceEntry.COLUMN_RADIUS);
 
         mCursor.moveToPosition(position); // get to the right location in the cursor
 

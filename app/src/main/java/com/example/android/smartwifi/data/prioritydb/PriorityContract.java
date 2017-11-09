@@ -1,4 +1,4 @@
-package com.example.android.smartwifi.data.geofencedb;
+package com.example.android.smartwifi.data.prioritydb;
 
 import android.net.Uri;
 import android.provider.BaseColumns;
@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
  * Created by jtwyp6 on 10/29/17.
  */
 
-public class GeofenceContract {
+public class PriorityContract {
 
     /* Add content provider constants to the Contract
      Clients need to know how to access the task data, and it's your job to provide
@@ -19,33 +19,32 @@ public class GeofenceContract {
       */
 
     // The authority, which is how your code knows which Content Provider to access
-    public static final String AUTHORITY = "com.example.android.smartwifi.geofence";
+    public static final String AUTHORITY = "com.example.android.smartwifi.priority";
 
     // The base content URI = "content://" + <authority>
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
     // Define the possible paths for accessing data in this contract
     // This is the path for the "tasks" directory
-    public static final String PATH_GEOFENCES = "geofences";
+    public static final String PATH_PRIORITY = "prioritys";
 
 
     /* TaskEntry is an inner class that defines the contents of the task table */
-    public static final class GeofenceEntry implements BaseColumns {
+    public static final class PriorityEntry implements BaseColumns {
 
         // TaskEntry content URI = base content URI + path
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_GEOFENCES).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PRIORITY).build();
 
 
         // Task table and column names
-        public static final String TABLE_NAME = "geofences";
+        public static final String TABLE_NAME = "prioritys";
 
         // Since TaskEntry implements the interface "BaseColumns", it has an automatically produced
         // "_ID" column in addition to the two below
-        public static final String COLUMN_DESCRIPTION = "description";
-        public static final String COLUMN_LATITUDE = "lat";
-        public static final String COLUMN_LONGITUDE = "long";
-        public static final String COLUMN_RADIUS = "radius";
+        public static final String COLUMN_ACCESSPOINT = "accesspoint";
+        public static final String COLUMN_PRIORITY = "priority";
+
 
 
         /*
@@ -55,13 +54,13 @@ public class GeofenceContract {
         Note: Because this implements BaseColumns, the _id column is generated automatically
 
         GeoFences
-         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        | _id  |    description     |      lat      |   long   |    radius     |
-         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        |  1   |        Home        |    100.000    |  33.0000 |      30       |
-         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        |  2   |        Work        |    110.000    |  43.0001 |      50       |
-         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+         - - - - - - - - - - - - - - - - - - - - - -
+        | _id  |     Accesspoint    |    Priority   |
+         - - - - - - - - - - - - - - - - - - - - - -
+        |  1   |        Home        |       3       |
+         - - - - - - - - - - - - - - - - - - - - - -
+        |  2   |      TigerWifi     |       5       |
+         - - - - - - - - - - - - - - - - - - - - - -
 
          */
 
