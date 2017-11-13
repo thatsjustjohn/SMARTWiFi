@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.android.smartwifi.PriorityActivity">
+
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="8dp">
+
+        <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <!-- TextView that displays the title of list -->
+            <TextView
+                android:paddingTop="8dp"
+                android:paddingLeft="16dp"
+                android:paddingBottom="8dp"
+                android:text="Priority List"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="26dp"
+                android:gravity="center"
+                style="@style/TextAppearance.AppCompat.Medium" />
+
+            <Switch
+                android:paddingTop="8dp"
+                android:paddingLeft="8dp"
+                android:paddingBottom="8dp"
+                android:id="@+id/sw_local_networks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Local"
+                android:textSize="18dp"
+                android:gravity="center"
+                android:checked="true"
+                style="@style/TextAppearance.AppCompat.Medium"/>
+
+
+        </LinearLayout>
+        <!-- A gray divider line at the bottom of each task -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+
+        <!-- RecyclerView that is responsible for holding a list of Geo Fences -->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerViewPriority"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="8dp"/>
+
+        <ProgressBar
+            android:id="@+id/pb_priority_loading_indicator"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"/>
+
+        <TextView
+            android:id="@+id/tv_priority_error_display"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:visibility="invisible"/>
+    </LinearLayout>
+
+    <!-- Floating action button that launches AddGeoFenceAtivity when clicked -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
+        app:layout_dodgeInsetEdges="bottom">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabSav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="4dp"
+            android:src="@drawable/ic_arrow_drop_down_circle_black_24dp"
+            android:tint="@color/colorPrimary"
+            app:backgroundTint="@android:color/holo_blue_light" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabDel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="4dp"
+            app:srcCompat="@android:drawable/ic_delete"
+            android:tint="@color/colorPrimary"
+            app:backgroundTint="#FF0000"
+             />
+    </LinearLayout>
+
+</FrameLayout>

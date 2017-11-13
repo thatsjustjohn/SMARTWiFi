@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements
     private static boolean PREFERENCES_HAVE_BEEN_UPDATED = false;
 
     static public boolean geofencesAlreadyRegistered = false;
+    static public boolean prriorityUpdated = false;
     public static String TAG2 = "DEBUG_GEO";
 
 

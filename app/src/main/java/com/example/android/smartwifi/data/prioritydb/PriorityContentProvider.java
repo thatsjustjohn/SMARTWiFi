@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import static com.example.android.smartwifi.data.prioritydb.PriorityContract.PriorityEntry.TABLE_NAME;
 
@@ -68,7 +69,35 @@ public class PriorityContentProvider extends ContentProvider {
         return true;
     }
 
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
+        final SQLiteDatabase db = mPriorityDBHelper.getWritableDatabase();
+        switch (sUriMatcher.match(uri)) {
 
+            case PRIORITYS:
+                db.beginTransaction();
+                int rowsInserted = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(PriorityContract.PriorityEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            rowsInserted++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+
+                if (rowsInserted > 0) {
+                    getContext().getContentResolver().notifyChange(uri, null);
+                }
+
+                return rowsInserted;
+
+            default:
+                return super.bulkInsert(uri, values);
+        }
+    }
     // Implement insert to handle requests to insert a single new row of data
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
@@ -148,32 +177,39 @@ public class PriorityContentProvider extends ContentProvider {
         // Get access to the database and write URI matching code to recognize a single item
         final SQLiteDatabase db = mPriorityDBHelper.getWritableDatabase();
 
-        int match = sUriMatcher.match(uri);
         // Keep track of the number of deleted tasks
-        int tasksDeleted; // starts as 0
+        int networksDeleted; // starts as 0
+
+        if(null == selection) selection = "1";
 
         // Write the code to delete a single row of data
         // [Hint] Use selections to delete an item by its row ID
-        switch (match) {
+        switch (sUriMatcher.match(uri)) {
             // Handle the single item case, recognized by the ID included in the URI path
+
+            case PRIORITYS:
+                // Use selections/selectionArgs to filter for this ID
+                networksDeleted = db.delete(TABLE_NAME, selection, selectionArgs);
+                break;
             case PRIORITYS_WITH_ID:
                 // Get the task ID from the URI path
                 String id = uri.getPathSegments().get(1);
                 // Use selections/selectionArgs to filter for this ID
-                tasksDeleted = db.delete(TABLE_NAME, "_id=?", new String[]{id});
+                networksDeleted = db.delete(TABLE_NAME, selection, selectionArgs);
                 break;
+
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
         // Notify the resolver of a change and return the number of items deleted
-        if (tasksDeleted != 0) {
+        if (networksDeleted != 0) {
             // A task was deleted, set notification
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
         // Return the number of tasks deleted
-        return tasksDeleted;
+        return networksDeleted;
     }
 
 

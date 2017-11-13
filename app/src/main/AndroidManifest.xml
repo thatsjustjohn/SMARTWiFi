@@ -37,13 +37,23 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
         <activity android:name=".SettingsActivity" />
 
         <activity android:name=".GeoFenceActivity" />
 
+        <activity android:name=".AddGeoFenceActivity" />
+
+        <activity android:name=".PriorityActivity"></activity>
+
+        <activity
+            android:name=".MapsActivity"
+            android:label="@string/app_name" />
+
         <service
             android:name=".sync.SMARTWifiIntentService"
             android:exported="false" />
+
         <service
             android:name=".sync.SMARTWifiFirebasejobService"
             android:exported="false">
@@ -52,24 +62,17 @@
             </intent-filter>
         </service>
 
-
         <service android:name=".sync.GeofenceTransitionIntentService" />
-
 
         <provider
             android:name=".data.prioritydb.PriorityContentProvider"
             android:authorities="com.example.android.smartwifi.priority"
             android:exported="false" />
+
         <provider
             android:name=".data.geofencedb.GeofenceContentProvider"
             android:authorities="com.example.android.smartwifi.geofence"
             android:exported="false" />
-
-
-
-
-
-        <activity android:name=".AddGeoFenceActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -82,9 +85,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/app_name"></activity>
     </application>
 
 </manifest>

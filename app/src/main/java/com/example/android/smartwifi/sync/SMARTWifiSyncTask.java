@@ -79,13 +79,17 @@ public class SMARTWifiSyncTask{
                     Log.d("MAIN TASK", "Trying to register second");
                     wifiGeoUtils.registerGeofences();
                 }
-                //WifiInfo wifiInfo = wifiGeoUtils.getConnectionInfo();
-                //Log.d("MAIN TASK", wifiInfo.toString());
-
-                //wifiGeoUtils.getLocation();
+                WifiInfo wifiInfo = wifiGeoUtils.getConnectionInfo();
+                Log.d("MAIN TASK", wifiInfo.toString());
 
                 if (pref_threshold) {
+                    Log.d("THRESHOLD / PRIORITY", wifiInfo.toString());
                     wifiGeoUtils.thresholdMonitor();
+
+                }
+                if(pref_priority){
+                    Log.d("PRIORITY", wifiInfo.toString());
+                    wifiGeoUtils.searchNetworks();
                 }
                 Thread.sleep(1000);
             }

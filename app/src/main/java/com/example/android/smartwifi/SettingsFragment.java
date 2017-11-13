@@ -72,6 +72,8 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             public boolean onPreferenceClick(Preference preference) {
                 //code for what you want it to do
                 Log.d("Clicked", "Clickled Priority");
+                Intent startPriorityActivity = new Intent(SettingsFragment.this.getActivity(), PriorityActivity.class);
+                startActivity(startPriorityActivity);
                 return true;
             }
         });

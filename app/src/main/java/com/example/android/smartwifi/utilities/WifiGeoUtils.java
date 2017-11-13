@@ -67,7 +67,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
 
     //MAIN FUNCTIONS SHARED PREFERENCES
     public boolean isThresholdEnabled = true;
-    public boolean isPriorityEnabled = false;
+    public boolean isPriorityEnabled = true;
     public boolean isGeoFenceEnabled = false;
     public boolean isDataLoggingEnabled = false;
 
@@ -96,6 +96,9 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     protected HashMap<String, SGeofence> mGeofenceMap = new HashMap<String, SGeofence>();
     protected ArrayList<Geofence> mGeofenceList;
 
+    //priority
+    protected HashMap<String, Integer> mPriorityMap = new HashMap<>();
+
     //variables
     public boolean isWiFiEnabled = false;
     public boolean isWiFiConnected = false;
@@ -118,6 +121,12 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         GeofenceUtils.getInstance().loadGeoFencesFromDB(context);
         mGeofenceMap = GeofenceUtils.getInstance().getGeofences();
         //register geofences
+
+
+        //Priority Setup
+        PriorityUtils.getInstance().loadPriorityFromDB(context);
+        mPriorityMap = PriorityUtils.getInstance().getPriorityMap();
+        Log.d("MAP", mPriorityMap.toString());
 
         //BUILD API
         buildGoogleApiClient();
@@ -221,10 +230,12 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient,
+                    geofencingRequest,
+                    mPendingIntent).setResultCallback(this);
+        }
 
-        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient,
-                geofencingRequest,
-                mPendingIntent).setResultCallback(this);
 
         registeredGeo = true;
     }
@@ -488,7 +499,19 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
             Log.d("Final AP", matchingAP.toString());
             //Check For Priority if no priority take the highest signal
             if(isPriorityEnabled){
+                boolean firstPass = true;
                 Log.d("Priority", "Code to make check priority list");
+                for(ScanResult singleAP : matchingAP){
+                    if (firstPass) {
+                        firstPass = false;
+                        apToConnectTo = singleAP;
+                    }
+                    if (mPriorityMap.get(singleAP.SSID.toString()) < mPriorityMap.get(apToConnectTo.SSID.toString())){
+                        apToConnectTo = singleAP;
+                    }
+                }
+                Log.d("Priority SAYS", apToConnectTo.toString());
+
             }else{
                 boolean firstPass = true;
                 for (ScanResult singleAP : matchingAP){
@@ -501,16 +524,15 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
                     }
 
                 }
-                Log.d("ATTEMPT Connect", apToConnectTo.toString());
-                for (WifiConfiguration knownConfig : matchingConfig) {
-                    if (apToConnectTo.SSID.toString().equals(knownConfig.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
-                        Log.d("CONNECTING TO", apToConnectTo.toString());
-                        wifiManager.enableNetwork(knownConfig.networkId, true);
-                        isWiFiConnected = isWifiConnected();
-                        return true;
-                    }
+            }
+            Log.d("ATTEMPT Connect", apToConnectTo.toString());
+            for (WifiConfiguration knownConfig : matchingConfig) {
+                if (apToConnectTo.SSID.toString().equals(knownConfig.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
+                    Log.d("CONNECTING TO", apToConnectTo.toString());
+                    wifiManager.enableNetwork(knownConfig.networkId, true);
+                    isWiFiConnected = isWifiConnected();
+                    return true;
                 }
-
             }
         }else{
             Log.d("Final AP", "NO NETWORKS FOUND");
