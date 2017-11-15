@@ -1,6 +1,8 @@
 package com.example.android.smartwifi.utilities;
 
 import android.Manifest;
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,15 +16,19 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
 
+import com.example.android.smartwifi.MainActivity;
 import com.example.android.smartwifi.sync.GeofenceTransitionIntentService;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,7 +43,15 @@ import com.google.android.gms.location.LocationServices;
 import com.example.android.smartwifi.data.SMARTWifiPreferences;
 import com.example.android.smartwifi.R;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -52,6 +66,10 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         com.google.android.gms.location.LocationListener,
         ResultCallback<Status> {
+    //file stuff
+    private String fileName = "AnalysisData.csv";
+    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile(), fileName);
+
     //Managers
     public WifiManager wifiManager;
     public LocationManager locationManager;
@@ -63,7 +81,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     public boolean isGPSEnabled = false;
     public boolean isNetworkEnabled = false;
     public boolean canGetLocation = false;
-    ;
+    private boolean reconnect =  false;
 
     //MAIN FUNCTIONS SHARED PREFERENCES
     public boolean isThresholdEnabled = true;
@@ -71,7 +89,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     public boolean isGeoFenceEnabled = false;
     public boolean isDataLoggingEnabled = false;
 
-    public Location location;
+    public Location mlocation;
     public double latitidue;
     public double longitude;
 
@@ -103,6 +121,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     public boolean isWiFiEnabled = false;
     public boolean isWiFiConnected = false;
     public boolean registeredGeo = false;
+    public boolean getGeoUpdates = false;
 
 
     //shared preferences
@@ -126,13 +145,10 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         //Priority Setup
         PriorityUtils.getInstance().loadPriorityFromDB(context);
         mPriorityMap = PriorityUtils.getInstance().getPriorityMap();
-        Log.d("MAP", mPriorityMap.toString());
+        //Log.d("MAP", mPriorityMap.toString());
 
         //BUILD API
         buildGoogleApiClient();
-
-
-        mGoogleApiClient.connect();
 
         //SharedPreferences
         initSLupdateSharedPreferences();
@@ -143,11 +159,8 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         listener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
-                Log.d("GPS", "on location change event");
-                Log.d("On Changed", String.valueOf(location));
-                if (!registeredGeo) {
-                    registerGeofences();
-                }
+                Log.d("GPS On Changed", String.valueOf(location));
+                mlocation = location;
             }
 
             @Override
@@ -196,12 +209,12 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     public void geoOnStop() {
         if (mGoogleApiClient.isConnecting() || mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
+            registeredGeo = false;
         }
     }
 
     public void registerGeofences() {
         if (!mGoogleApiClient.isConnected()) {
-            Log.d("REGISTERGEO", String.valueOf(R.string.not_connected));
             return;
         }
 
@@ -276,9 +289,11 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     public void onResult(@NonNull Status status) {
 
         if (status.isSuccess()) {
+            String addedAnything = "Geofences Added";
             Toast.makeText(context,
-                    "Geofences Added", Toast.LENGTH_SHORT)
+                    addedAnything, Toast.LENGTH_SHORT)
                     .show();
+
         } else {
             registeredGeo = false;
             String errorMessage = GeofenceErrorMessagesUtils.getErrorString(context, status.getStatusCode());
@@ -295,7 +310,6 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
             return;
         }
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-
     }
 
     public void stopLocationUpdates(){
@@ -305,32 +319,29 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d("GEO",
+        Log.d("GPS-OLC",
                 "new location : " + location.getLatitude() + ", "
                         + location.getLongitude() + ". "
                         + location.getAccuracy());
         GeofenceTransitionIntentService.accuracy = (int)location.getAccuracy();
-
-        if (!registeredGeo) {
-            registerGeofences();
-        }
+        mlocation = location;
     }
 
 
-    private void initSLupdateSharedPreferences() {
+    public void initSLupdateSharedPreferences() {
         isThresholdEnabled = SMARTWifiPreferences.isThresholdEnabled(context);
         isPriorityEnabled = SMARTWifiPreferences.isPriorityEnabled(context);
         isDataLoggingEnabled = SMARTWifiPreferences.isDataLoggingEnabled(context);
         isGeoFenceEnabled = SMARTWifiPreferences.isGeoFenceEnabled(context);
         threshold_connect = SMARTWifiPreferences.reconnectThreshold(context);
         threshold_disconnect = SMARTWifiPreferences.disconnectThreshold(context);
-        Log.d("SP", String.valueOf(isThresholdEnabled) + ":"
+        /*Log.d("SP", String.valueOf(isThresholdEnabled) + ":"
                 + String.valueOf(isPriorityEnabled) + ":"
                 + String.valueOf(isGeoFenceEnabled) + ":"
                 + String.valueOf(isDataLoggingEnabled) + ":"
                 + String.valueOf(threshold_connect) + ":"
                 + String.valueOf(threshold_disconnect));
-
+        */
     }
 
     public void initializeWifi() {
@@ -339,9 +350,8 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
             isWiFiConnected = isWifiConnected();
             WifiInfo info = wifiManager.getConnectionInfo();
             if (!isWiFiEnabled) {
-                Log.d("NOT ENABLED", String.valueOf(isWiFiEnabled));
+                return;
             } else {
-                Log.d("ENABLED", String.valueOf(isWiFiEnabled));
                 context.registerReceiver(wifiReceiver = new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
@@ -350,14 +360,12 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
                         wifiScanList = wifiManager.getScanResults();
                         size = wifiScanList.size();
                         wifis = new String[wifiScanList.size()];
-                        Log.d("onRecieve WIFIGEO", String.valueOf(size) + " Access Points Register");
                     }
                 }, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
                 wifiManager.startScan();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Log.d("ERROR", String.valueOf(isWiFiEnabled));
         }
 
     }
@@ -382,15 +390,21 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void startLocationTracking() {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+        if(getGeoUpdates == false) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, listener, Looper.getMainLooper());
+            getGeoUpdates = true;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BETWEEN_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, listener, Looper.getMainLooper());
     }
 
     public void stopLocationTracking(){
-        if(locationManager != null){
-            locationManager.removeUpdates(listener);
+        if(locationManager != null) {
+            if (getGeoUpdates == true) {
+                locationManager.removeUpdates(listener);
+                getGeoUpdates = false;
+            }
         }
     }
 
@@ -403,7 +417,9 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
             Location location = locationManager.getLastKnownLocation(locationManager.GPS_PROVIDER);
             if(location != null)
             {
-                Log.e("Location", String.valueOf(location));
+                Log.e("GPS Location", String.valueOf(location));
+                mlocation = location;
+                //UNTIL CHANGE ON LOCATION IS VERIFIED AS WORKING
                 return location;
             }else
             {
@@ -425,11 +441,12 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         wifiInfo = wifiManager.getConnectionInfo();
         isWiFiConnected = isWifiConnected();
         //IF WIFI IS CONNECTED 1. CHECK THRESHOLD 2. REASSOCIATE 3. SEARCH FOR NEW DIFFERENT NETWORK 4. DISCONNECT
-        if(isWiFiConnected) {
+        if(isWiFiConnected && wifiInfo != null) {
             if (wifiInfo.getRssi() < threshold_disconnect && wifiInfo.getRssi() != -127) { //-127 is nothing / broken
                 //TRY TO SEARCH FOR A BETTER NETWORK (SAME)
                 if (!wifiManager.reassociate()) {
                     //TRY TO SEARCH FOR A BETTER NETWORK SAME OR DIFFERENT
+                    reconnect = true;
                     if (!searchNetworks()) {
                         //IF FAIL DISCONNECT
                         wifiManager.disconnect();
@@ -441,6 +458,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         }else //IF WIFI IS NOT CONNECTED (SEARCH)
         {
             Log.e("Threshold", "Searching to Reconnect");
+            reconnect = true;
             searchNetworks();
         }
 
@@ -484,11 +502,11 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
            // Log.d("SF", wifiScanList.toString());
             for (ScanResult singleAP : wifiScanList) {
                 for (WifiConfiguration knownAP : configuredWifiList) {
-                    Log.d("Matchy", singleAP.SSID.toString() + " " + knownAP.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""));
+                    //Log.d("Matchy", singleAP.SSID.toString() + " " + knownAP.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""));
                     if (singleAP.SSID.toString().equals(knownAP.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
                         matchingAP.add(singleAP);
                         matchingConfig.add(knownAP);
-                        Log.d("AP2", singleAP.toString());
+                        //Log.d("AP2", singleAP.toString());
                     }
                 }
             }
@@ -496,11 +514,13 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
 
         //IF NETWORKS MATCHES ARE FOUND
         if (matchingAP != null && !matchingAP.isEmpty()) {
-            Log.d("Final AP", matchingAP.toString());
+            //Log.d("Final AP", matchingAP.toString());
             //Check For Priority if no priority take the highest signal
-            if(isPriorityEnabled){
+            PriorityUtils.getInstance().loadPriorityFromDB(context);
+            mPriorityMap = PriorityUtils.getInstance().priorityMap;
+            if(isPriorityEnabled && !mPriorityMap.isEmpty() && !(mPriorityMap == null) ){
+                reconnect = true;
                 boolean firstPass = true;
-                Log.d("Priority", "Code to make check priority list");
                 for(ScanResult singleAP : matchingAP){
                     if (firstPass) {
                         firstPass = false;
@@ -525,15 +545,24 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
 
                 }
             }
-            Log.d("ATTEMPT Connect", apToConnectTo.toString());
-            for (WifiConfiguration knownConfig : matchingConfig) {
-                if (apToConnectTo.SSID.toString().equals(knownConfig.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
-                    Log.d("CONNECTING TO", apToConnectTo.toString());
-                    wifiManager.enableNetwork(knownConfig.networkId, true);
-                    isWiFiConnected = isWifiConnected();
-                    return true;
+
+            //remove quotes from current network
+            String curWifi = wifiInfo.getSSID().toString().replace("\"", "");
+
+            //compare to see if they are the same if they are not connect
+            if(!curWifi.equals(apToConnectTo.SSID.toString()) && reconnect) {
+                Log.d("ATTEMPT Connect", apToConnectTo.toString());
+                for (WifiConfiguration knownConfig : matchingConfig) {
+                    if (apToConnectTo.SSID.toString().equals(knownConfig.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
+                        Log.d("CONNECTING TO", apToConnectTo.toString());
+                        wifiManager.enableNetwork(knownConfig.networkId, true);
+                        isWiFiConnected = isWifiConnected();
+                        reconnect = false;
+                        return true;
+                    }
                 }
             }
+            //else already connected to a network
         }else{
             Log.d("Final AP", "NO NETWORKS FOUND");
             return false;
@@ -550,5 +579,60 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         }
         isWiFiEnabled = false;
         return false;
+    }
+
+    //WRiting stuff
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void writeDataLogging() {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("NODATA", "PERMISSION NOT ENABLED");
+            return;
+        }
+
+        getLocation();
+        wifiInfo = wifiManager.getConnectionInfo();
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+        SimpleDateFormat tf = new SimpleDateFormat( "HH:mm:ss");
+        //SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = df.format(mlocation.getTime());
+        String formattedTime = tf.format(mlocation.getTime());
+        String data = "";
+        FileOutputStream outputstream;
+        try {
+            File file1 = new File(Environment.getExternalStorageDirectory(), "TEST.csv");
+            outputstream = new FileOutputStream(file1, true);
+            OutputStreamWriter oswriter = new OutputStreamWriter(outputstream);
+            BufferedWriter bwriter = new BufferedWriter(oswriter);
+            data = String.valueOf(mlocation.getLatitude()) + ", " +
+                    String.valueOf(mlocation.getLongitude()) + ", " +
+                    String.valueOf(mlocation.getAccuracy()) + ", " +
+                    String.valueOf(mlocation.getSpeed()) + ", " +
+                    formattedDate + ", " +
+                    formattedTime + ", " +
+                    wifiInfo.getSSID().replace("\"", "") + ", " +
+                    String.valueOf(wifiInfo.getRssi()) + ", " +
+                    wifiInfo.getBSSID() + ", " +
+                    wifiInfo.getMacAddress() + ", " +
+                    String.valueOf(wifiInfo.getFrequency()) + ", " +
+                    String.valueOf(wifiInfo.getIpAddress()) + ", " +
+                    String.valueOf(wifiInfo.getLinkSpeed()) + ", " +
+                    String.valueOf(wifiInfo.getNetworkId());
+            bwriter.append(data);
+            bwriter.newLine();
+            bwriter.close();
+            outputstream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Log.d("DATA", data);
     }
 }

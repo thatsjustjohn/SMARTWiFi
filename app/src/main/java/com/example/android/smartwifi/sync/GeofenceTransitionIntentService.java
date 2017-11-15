@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.content.Context;
@@ -32,7 +33,9 @@ import java.util.List;
 public class GeofenceTransitionIntentService extends IntentService {
     protected static final String TAG = "geofence-transitions";
     public static final int NOTIFICATION_ID = 1;
+    private WifiManager wifiManager;
     static public int accuracy;
+    static public int pref_geo_fence;
 
     public GeofenceTransitionIntentService() {
         super(TAG);
@@ -41,6 +44,7 @@ public class GeofenceTransitionIntentService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         if (geofencingEvent.hasError()) {
             String errorMessage = GeofenceErrorMessagesUtils.getErrorString(this,
@@ -72,14 +76,17 @@ public class GeofenceTransitionIntentService extends IntentService {
                     switch (geofenceTransition) {
                         case Geofence.GEOFENCE_TRANSITION_DWELL:
                             transitionName = "dwell";
+                            enableWifi();
                             break;
 
                         case Geofence.GEOFENCE_TRANSITION_ENTER:
                             transitionName = "enter";
+                            enableWifi();
                             break;
 
                         case Geofence.GEOFENCE_TRANSITION_EXIT:
                             transitionName = "exit";
+                            disableWifi();
                             break;
                     }
                     Log.d(TAG, smartgeo.getId() + ":" + transitionName);
@@ -124,6 +131,17 @@ public class GeofenceTransitionIntentService extends IntentService {
         }
     }
 
+    private void enableWifi(){
+        if(!wifiManager.isWifiEnabled()){
+            wifiManager.setWifiEnabled(true);
+        }
+    }
+
+    private void disableWifi(){
+        if(wifiManager.isWifiEnabled()){
+            wifiManager.setWifiEnabled(false);
+        }
+    }
     private void sendNotification(String notificationDetails) {
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);

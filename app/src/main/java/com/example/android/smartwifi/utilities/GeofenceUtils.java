@@ -62,8 +62,6 @@ public class GeofenceUtils {
         //loop through DB
         while (!mCursor.isAfterLast()) {
 
-            Log.d("DB", mCursor.getString(descriptionIndex));
-
             //Get data
             String mDescription = mCursor.getString(descriptionIndex);
             double mLat = mCursor.getDouble(latitidueIndex);
@@ -88,16 +86,7 @@ public class GeofenceUtils {
         }
         // make sure to close the cursor
 
-        Log.d("DB", geofences.toString());
-
-
         mCursor.close();
-
-        geofences.put("The Shire", new SGeofence("The Shire", 39.0015329, -77.0867936,
-                50, 12* DateUtils.HOUR_IN_MILLIS,
-                Geofence.GEOFENCE_TRANSITION_ENTER
-                        | Geofence.GEOFENCE_TRANSITION_DWELL
-                        | Geofence.GEOFENCE_TRANSITION_EXIT));
     }
 
 
@@ -109,7 +98,6 @@ public class GeofenceUtils {
     }
 
     public HashMap<String, SGeofence> getGeofences() {
-        Log.d("DB", "BITCHES" + geofences.toString());
         return this.geofences;
     }
 

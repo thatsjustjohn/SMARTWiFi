@@ -1,5 +1,6 @@
 package com.example.android.smartwifi;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -202,10 +203,15 @@ public class MainActivity extends AppCompatActivity implements
         ///This Code doesn't really work yet...moving to utils
 
         //CHECK PERMISSIONS WIFI AND LAT LONG
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.INTERNET}
-                        , 10);
+                requestPermissions(new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.INTERNET,
+                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                10);
             }
             return;
         }
@@ -215,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
         //service
-        startService(new Intent(this, SMARTWifiIntentService.class));
+       // startService(new Intent(this, SMARTWifiIntentService.class));
 
 
     }

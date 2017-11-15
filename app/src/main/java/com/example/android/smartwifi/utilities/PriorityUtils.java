@@ -62,9 +62,6 @@ public class PriorityUtils {
 
         //loop through DB
         while (!mCursor.isAfterLast()) {
-
-            Log.d("DB", mCursor.getString(networkIndex));
-
             //Get data
             String mNetwork = mCursor.getString(networkIndex);
             int mPriority = mCursor.getInt(priorityIndex);
@@ -78,9 +75,6 @@ public class PriorityUtils {
             mCursor.moveToNext();
         }
         // make sure to close the cursor
-
-        Log.d("DB", priorityMap.toString());
-
 
         mCursor.close();
     }
