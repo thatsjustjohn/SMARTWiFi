@@ -144,6 +144,19 @@
     -->
     </PreferenceCategory>
 
+    <PreferenceCategory
+        android:title="@string/pref_access_point_label">
+        <CheckBoxPreference
+            android:defaultValue="@bool/pref_access_point_default"
+            android:key="@string/pref_access_point_key"
+            android:title="@string/pref_access_point_label"
+            android:summaryOn="@string/pref_show_true"
+            android:summaryOff="@string/pref_show_false"/>
+        <Preference
+            android:title="@string/pref_ap_list_button_label"
+            android:key="@string/pref_ap_list_button_key"
+            android:summary="@string/pref_ap_list_button_summary"/>
+    </PreferenceCategory>
 
 
     <!-- Data Logging -->

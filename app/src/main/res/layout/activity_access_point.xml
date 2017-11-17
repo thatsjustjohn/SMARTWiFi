@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.android.smartwifi.AccessPointActivity">
+
+
+    <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="8dp">
+
+            <!-- TextView that displays the title of list -->
+            <TextView
+                android:paddingTop="8dp"
+                android:paddingLeft="16dp"
+                android:paddingBottom="8dp"
+                android:text="Access Points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="26dp"
+                android:gravity="center"
+                style="@style/TextAppearance.AppCompat.Medium" />
+
+            <!-- A gray divider line at the bottom of each task -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
+
+            <!-- RecyclerView that is responsible for holding a list of Geo Fences -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerViewAccessPoints"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingBottom="8dp"/>
+
+            <ProgressBar
+                android:id="@+id/pb_ap_loading_indicator"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/tv_ap_error_display"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:visibility="invisible"/>
+        </LinearLayout>
+
+        <!-- Floating action button that launches AddGeoFenceAtivity when clicked -->
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabAPSav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:tint="@color/colorPrimary"
+            app:backgroundTint="@android:color/holo_blue_light"
+            app:srcCompat="@android:drawable/ic_input_add" />
+
+    </FrameLayout>

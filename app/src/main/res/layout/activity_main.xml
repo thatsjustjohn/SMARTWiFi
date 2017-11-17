@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
-    android:paddingTop="16dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="8dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -40,7 +40,6 @@
             android:drawableBottom="@android:drawable/btn_radio"
             android:button="@null"
             android:gravity="center_horizontal|bottom"
-            android:layout_marginLeft="16dp"
             android:clickable="false"
             android:text="Priority"
             android:textSize="10sp"
@@ -55,27 +54,43 @@
             android:drawableBottom="@android:drawable/btn_radio"
             android:button="@null"
             android:gravity="center_horizontal|bottom"
-            android:layout_marginLeft="16dp"
             android:clickable="false"
             android:text="GeoFencing"
             android:textSize="10sp"
             android:layout_weight="1"
 
             />
+
+        <RadioButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rb_accesspoint"
+            android:textColor="@color/textColorPrimary"
+            android:text="Access Point"
+            android:drawableBottom="@android:drawable/btn_radio"
+            android:button="@null"
+            android:gravity="center_horizontal|bottom"
+            android:clickable="false"
+            android:textSize="10sp"
+            android:buttonTint="@android:color/holo_blue_light"
+            android:layout_weight="1"
+
+            />
+
         <RadioButton
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/rb_data_log"
             android:textColor="@color/textColorPrimary"
+            android:text="Data Logging"
             android:drawableBottom="@android:drawable/btn_radio"
             android:button="@null"
             android:gravity="center_horizontal|bottom"
-            android:layout_marginLeft="16dp"
             android:clickable="false"
-            android:text="Data Logging"
             android:textSize="10sp"
-            android:layout_weight="1"
-            />
+            android:buttonTint="@android:color/holo_blue_light"
+            android:layout_weight="1" />
+
     </LinearLayout>
 
     <!-- A gray divider line at the bottom of each task -->
@@ -94,7 +109,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
 
-        android:text="Wifi: TigerWifi\nStrength: Your Momma"/>
+        android:text="Wifi: TigerWifi\nStrength: NULL"/>
 
     <!-- A gray divider line at the bottom of each task -->
     <View

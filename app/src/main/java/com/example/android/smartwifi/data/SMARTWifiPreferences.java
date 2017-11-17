@@ -62,6 +62,22 @@ public final class SMARTWifiPreferences {
         return shouldGeoFenceEnabled;
     }
 
+    public static boolean isAccessPointEnabled(Context context) {
+
+        String isAccessPointEnabledKey = context.getString(R.string.pref_access_point_key);
+
+        boolean isAccessPointEnabledDefault = context
+                .getResources()
+                .getBoolean(R.bool.pref_access_point_default);
+
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+        /* If a value is stored with the key, we extract it here. If not, use a default. */
+        boolean shouldAccessPointEnabled = sp
+                .getBoolean(isAccessPointEnabledKey, isAccessPointEnabledDefault);
+
+        return shouldAccessPointEnabled;
+    }
 
     public static boolean isDataLoggingEnabled(Context context) {
 

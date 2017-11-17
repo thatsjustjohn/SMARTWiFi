@@ -23,6 +23,7 @@ public class SMARTWifiSyncTask{
     public static boolean pref_geolocation;
     public static boolean pref_datalogging;
     public static boolean pref_priority;
+    public static boolean pref_accesspoint;
 
 
     public static void executeTask(Context context, String action) {
@@ -96,7 +97,7 @@ public class SMARTWifiSyncTask{
 
                 }
                 //IF PRIORITY
-                if(pref_priority && priorityCount == 10){
+                if(pref_priority){
                     Log.d("PRIORITY", String.valueOf(priorityCount));
                     priorityCount = 0;
                     wifiGeoUtils.searchNetworks();
@@ -114,12 +115,13 @@ public class SMARTWifiSyncTask{
                 }
 
                 //CHECK PRIORITY EVERY 10 seconds
-                priorityCount += 1;
+                //priorityCount += 1;
                 Thread.sleep(1000);
             }
+            //Disable receiver
+            wifiGeoUtils.geoOnStop();
+            wifiGeoUtils.unregisterReciever();
         }
-        //Disable receiver
-        wifiGeoUtils.geoOnStop();
     }
 
     private static void updatedSharedPreferences(Context context) {
@@ -127,6 +129,7 @@ public class SMARTWifiSyncTask{
         pref_geolocation = SMARTWifiPreferences.isGeoFenceEnabled(context);
         pref_datalogging = SMARTWifiPreferences.isDataLoggingEnabled(context);
         pref_priority = SMARTWifiPreferences.isPriorityEnabled(context);
+        pref_accesspoint = SMARTWifiPreferences.isAccessPointEnabled(context);
     }
 
 

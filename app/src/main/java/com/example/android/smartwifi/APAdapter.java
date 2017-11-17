@@ -10,6 +10,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.nio.channels.ScatteringByteChannel;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class APAdapter extends RecyclerView.Adapter<APAdapter.APAdapterViewHolde
      * The interface that receives onClick messages.
      */
     public interface APAdapterOnClickHandler{
-        void onClick(String apItemInList);
+        void onClick(ScanResult apItemInList);
     }
 
     /**
@@ -67,7 +68,7 @@ public class APAdapter extends RecyclerView.Adapter<APAdapter.APAdapterViewHolde
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             //<-------This will change with the list information --------------->
-            String apItemInList = mAPData.get(getAdapterPosition()).toString();
+            ScanResult apItemInList = mAPData.get(getAdapterPosition());
             mClickHandler.onClick(apItemInList);
         }
     }

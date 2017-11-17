@@ -88,6 +88,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     public boolean isPriorityEnabled = true;
     public boolean isGeoFenceEnabled = false;
     public boolean isDataLoggingEnabled = false;
+    public boolean isAccessPointEnabled = false;
 
     public Location mlocation;
     public double latitidue;
@@ -112,9 +113,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
     private BroadcastReceiver wifiReceiver;
 
     protected HashMap<String, SGeofence> mGeofenceMap = new HashMap<String, SGeofence>();
-    protected ArrayList<Geofence> mGeofenceList;
-
-    //priority
+    protected HashMap<String, String> mAccessPointMap = new HashMap<String, String>();
     protected HashMap<String, Integer> mPriorityMap = new HashMap<>();
 
     //variables
@@ -139,13 +138,15 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         //GET Geo Fences
         GeofenceUtils.getInstance().loadGeoFencesFromDB(context);
         mGeofenceMap = GeofenceUtils.getInstance().getGeofences();
-        //register geofences
-
 
         //Priority Setup
         PriorityUtils.getInstance().loadPriorityFromDB(context);
         mPriorityMap = PriorityUtils.getInstance().getPriorityMap();
         //Log.d("MAP", mPriorityMap.toString());
+
+        //Access Point Setup
+        AccessPointUtils.getInstance().loadaccesspointFromDB(context);
+        mAccessPointMap = AccessPointUtils.getInstance().getAccessPointMap();
 
         //BUILD API
         buildGoogleApiClient();
@@ -333,6 +334,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         isPriorityEnabled = SMARTWifiPreferences.isPriorityEnabled(context);
         isDataLoggingEnabled = SMARTWifiPreferences.isDataLoggingEnabled(context);
         isGeoFenceEnabled = SMARTWifiPreferences.isGeoFenceEnabled(context);
+        isAccessPointEnabled = SMARTWifiPreferences.isAccessPointEnabled(context);
         threshold_connect = SMARTWifiPreferences.reconnectThreshold(context);
         threshold_disconnect = SMARTWifiPreferences.disconnectThreshold(context);
         /*Log.d("SP", String.valueOf(isThresholdEnabled) + ":"
@@ -506,7 +508,7 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
                     if (singleAP.SSID.toString().equals(knownAP.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
                         matchingAP.add(singleAP);
                         matchingConfig.add(knownAP);
-                        //Log.d("AP2", singleAP.toString());
+                        Log.d("AP2", singleAP.toString());
                     }
                 }
             }
@@ -514,10 +516,26 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
 
         //IF NETWORKS MATCHES ARE FOUND
         if (matchingAP != null && !matchingAP.isEmpty()) {
+
+            AccessPointUtils.getInstance().loadaccesspointFromDB(context);
+            mAccessPointMap = AccessPointUtils.getInstance().getAccessPointMap();
+
+            if(isAccessPointEnabled && !mAccessPointMap.isEmpty() && !(mAccessPointMap == null) ) {
+                reconnect = true;
+                scanIterator = matchingAP.iterator();
+                while (scanIterator.hasNext()) {
+                    ScanResult scanResult = scanIterator.next();
+                    if(!mAccessPointMap.containsKey(scanResult.BSSID)){
+                        scanIterator.remove();
+                    }
+                }
+                Log.d("Final AP List", matchingAP.toString());
+            }
             //Log.d("Final AP", matchingAP.toString());
             //Check For Priority if no priority take the highest signal
             PriorityUtils.getInstance().loadPriorityFromDB(context);
             mPriorityMap = PriorityUtils.getInstance().priorityMap;
+
             if(isPriorityEnabled && !mPriorityMap.isEmpty() && !(mPriorityMap == null) ){
                 reconnect = true;
                 boolean firstPass = true;
@@ -555,6 +573,10 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
                 for (WifiConfiguration knownConfig : matchingConfig) {
                     if (apToConnectTo.SSID.toString().equals(knownConfig.SSID.toString().replaceAll("^['\"]*", "").replaceAll("['\"]*$", ""))) {
                         Log.d("CONNECTING TO", apToConnectTo.toString());
+
+                        //if access point is enabled
+                        if(isAccessPointEnabled)knownConfig.BSSID = apToConnectTo.BSSID;
+
                         wifiManager.enableNetwork(knownConfig.networkId, true);
                         isWiFiConnected = isWifiConnected();
                         reconnect = false;
@@ -601,9 +623,13 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
         SimpleDateFormat tf = new SimpleDateFormat( "HH:mm:ss");
+        SimpleDateFormat dayf = new SimpleDateFormat("EEEE");
+        SimpleDateFormat hourf = new SimpleDateFormat("kk");
         //SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String formattedDate = df.format(mlocation.getTime());
         String formattedTime = tf.format(mlocation.getTime());
+        String formattedDay = dayf.format(mlocation.getTime());
+        String formattedHour = hourf.format(mlocation.getTime());
         String data = "";
         FileOutputStream outputstream;
         try {
@@ -617,6 +643,8 @@ public class WifiGeoUtils implements GoogleApiClient.ConnectionCallbacks,
                     String.valueOf(mlocation.getSpeed()) + ", " +
                     formattedDate + ", " +
                     formattedTime + ", " +
+                    formattedDay + ", " +
+                    formattedHour + ", " +
                     wifiInfo.getSSID().replace("\"", "") + ", " +
                     String.valueOf(wifiInfo.getRssi()) + ", " +
                     wifiInfo.getBSSID() + ", " +

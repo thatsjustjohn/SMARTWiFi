@@ -102,8 +102,17 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
             }
         });
 
-
-
+        Preference accessPointButton = findPreference(getString(R.string.pref_ap_list_button_key));
+        accessPointButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //code for what you want it to do
+                Log.d("Clicked", "Clickled AP");
+                Intent startAPActivity = new Intent(SettingsFragment.this.getActivity(), AccessPointActivity.class);
+                startActivity(startAPActivity);
+                return true;
+            }
+        });
 
         int count = prefScreen.getPreferenceCount();
         for(int i = 0; i < count; i++){

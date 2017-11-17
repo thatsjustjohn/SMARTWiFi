@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <array name="pref_number_option_labels">
-        <item>@string/pref_number_label_one</item>
-        <item>@string/pref_number_label_two</item>
-        <item>@string/pref_number_label_three</item>
-    </array>
 
-    <array name="pref_number_option_values">
-        <item>@string/pref_number_one_value</item>
-        <item>@string/pref_number_two_value</item>
-        <item>@string/pref_number_three_value</item>
-    </array>
 </resources>

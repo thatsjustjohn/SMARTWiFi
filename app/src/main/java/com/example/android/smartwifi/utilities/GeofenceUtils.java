@@ -16,7 +16,6 @@ import com.google.android.gms.location.Geofence;
  */
 
 public class GeofenceUtils {
-    protected GoogleApiClient mGoogleApiClient;
     protected HashMap<String, SGeofence> geofences = new HashMap<String, SGeofence>();
 
     private Cursor mCursor;

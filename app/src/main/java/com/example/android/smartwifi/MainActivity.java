@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,8 +60,7 @@ public class MainActivity extends AppCompatActivity implements
     private RadioButton mPriorityRadioButton;
     private RadioButton mGeoFencingRadioButton;
     private RadioButton mDataLoggingRadioButton;
-
-
+    private RadioButton mAccessPointRadioButton;
 
     private static final int AP_LOADER_ID = 0;
 
@@ -131,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements
         mPriorityRadioButton = (RadioButton) findViewById(R.id.rb_priority);
         mDataLoggingRadioButton = (RadioButton) findViewById(R.id.rb_data_log);
         mGeoFencingRadioButton = (RadioButton) findViewById(R.id.rb_geo_fence);
+        mAccessPointRadioButton = (RadioButton) findViewById(R.id.rb_accesspoint);
 
         /*
          * LinearLayoutManager can support HORIZONTAL or VERTICAL orientations. The reverse layout
@@ -237,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements
         mThresholdRadioButton.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_threshold_key),getResources().getBoolean(R.bool.pref_threshold_default)));
         mGeoFencingRadioButton.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_geo_fence_key),getResources().getBoolean(R.bool.pref_geo_fence_default)));
         mDataLoggingRadioButton.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_data_log_key),getResources().getBoolean(R.bool.pref_data_log_default)));
+        mAccessPointRadioButton.setChecked(sharedPreferences.getBoolean(getString(R.string.pref_access_point_key),getResources().getBoolean(R.bool.pref_access_point_default)));
 
 
         /*setS(sharedPreferences.getBoolean(getString(R.string.pref_show_bass_key),
@@ -413,11 +415,17 @@ public class MainActivity extends AppCompatActivity implements
      * @param apItemInList String describing weather details for a particular day
      */
     @Override
-    public void onClick(String apItemInList) {
+    public void onClick(ScanResult apItemInList) {
         Context context = this;
         Class destinationClass = DetailAPActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, apItemInList);
+        //intentToStartDetailActivity.putExtra(Intent.EXTRA_TEXT, apItemInList);
+        intentToStartDetailActivity.putExtra("SSID", apItemInList.SSID);
+        intentToStartDetailActivity.putExtra("RSSI", String.valueOf(apItemInList.level));
+        intentToStartDetailActivity.putExtra("BSSID", apItemInList.BSSID);
+        intentToStartDetailActivity.putExtra("Freq", String.valueOf(apItemInList.frequency));
+        intentToStartDetailActivity.putExtra("Channel", String.valueOf(convertFrequencyToChannel(apItemInList.frequency)));
+
 
         startActivity(intentToStartDetailActivity);
     }
@@ -518,6 +526,8 @@ public class MainActivity extends AppCompatActivity implements
             mDataLoggingRadioButton.setChecked(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_data_log_default)));
         }else if (key.equals(getString(R.string.pref_geo_fence_key))){
             mGeoFencingRadioButton.setChecked(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_geo_fence_default)));
+        } if (key.equals(getString(R.string.pref_access_point_key))){
+            mAccessPointRadioButton.setChecked(sharedPreferences.getBoolean(key, getResources().getBoolean(R.bool.pref_access_point_default)));
         }
         /*
          * Set this flag to true so that when control returns to MainActivity, it can refresh the
@@ -530,5 +540,14 @@ public class MainActivity extends AppCompatActivity implements
          * network again by keeping a copy of the data in a manageable format.
          */
         PREFERENCES_HAVE_BEEN_UPDATED = true;
+    }
+
+
+    public static int convertFrequencyToChannel(int freq) {
+        if (freq>= 2412 &&freq<= 2484) { return (freq - 2412) / 5 + 1; } else if (freq>= 5170 &&freq<= 5825) {
+            return (freq - 5170) / 5 + 34;
+        } else {
+            return -1;
+        }
     }
 }

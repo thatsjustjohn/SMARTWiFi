@@ -3,6 +3,7 @@ package com.example.android.smartwifi.utilities;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -54,6 +55,7 @@ public class GeofenceNotification {
 		NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(
 				context)
 				.setSmallIcon(R.drawable.ic_notifications_black_24dp)
+				.setColor(Color.BLUE)
 				.setContentTitle(context.getString(R.string.app_name))
 				.setContentText(notificationText).setAutoCancel(true);
 
